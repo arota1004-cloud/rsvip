@@ -8,11 +8,11 @@ export default function Home() {
           RSViP
         </span>
         <a
-          href="#"
+          href="/auth"
           className="text-sm font-medium px-5 py-2 rounded-full transition-opacity hover:opacity-80"
           style={{ backgroundColor: "#D94F35", color: "#F5F0E8" }}
         >
-          시작하기
+          로그인
         </a>
       </nav>
 
@@ -30,7 +30,7 @@ export default function Home() {
         </p>
         <div className="flex items-center justify-center gap-4 flex-wrap">
           <a
-            href="#"
+            href="/eventgenerate"
             className="px-8 py-3 rounded-full font-semibold text-base transition-opacity hover:opacity-85"
             style={{ backgroundColor: "#D94F35", color: "#F5F0E8" }}
           >
@@ -94,7 +94,7 @@ export default function Home() {
           리스트업부터 사후 관리까지, 한 번에 해결합니다.
         </p>
         <a
-          href="#"
+          href="/eventgenerate"
           className="inline-block px-10 py-4 rounded-full font-semibold text-base transition-opacity hover:opacity-85"
           style={{ backgroundColor: "#7A2A35", color: "#F5F0E8" }}
         >
