@@ -12,15 +12,18 @@ type Alert = {
   type: 'warn' | 'error' | 'info'
 }
 
+type SheetSave = { status: 'saved' | 'saving' | 'error'; savedAt?: string }
+
 type Props = {
   eventId: string
   initialName: string
   initialMemo: string | null
   alerts: Alert[]
   onDismissAlert: (id: string) => void
+  sheetSave?: SheetSave
 }
 
-export default function TopDock({ eventId, initialName, initialMemo, alerts, onDismissAlert }: Props) {
+export default function TopDock({ eventId, initialName, initialMemo, alerts, onDismissAlert, sheetSave }: Props) {
   const [name, setName] = useState(initialName)
   const [memo, setMemo] = useState(initialMemo ?? '')
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('saved')
@@ -75,8 +78,8 @@ export default function TopDock({ eventId, initialName, initialMemo, alerts, onD
         >
           RSViP
         </Link>
-        <span className="text-xs tabular-nums" style={{ color: saveStatusColor(saveStatus) }}>
-          {saveStatusLabel(saveStatus)}
+        <span className="text-xs tabular-nums" style={{ color: sheetSave ? sheetSaveColor(sheetSave.status) : saveStatusColor(saveStatus) }}>
+          {sheetSave ? sheetSaveLabel(sheetSave) : saveStatusLabel(saveStatus)}
         </span>
       </div>
 
@@ -136,6 +139,16 @@ function saveStatusLabel(s: SaveStatus) {
   return '저장됨'
 }
 function saveStatusColor(s: SaveStatus) {
+  if (s === 'saving') return '#8B6A5A'
+  if (s === 'error') return '#D94F35'
+  return 'rgba(61,26,46,0.3)'
+}
+function sheetSaveLabel({ status, savedAt }: { status: SaveStatus; savedAt?: string }) {
+  if (status === 'saving') return '저장 중...'
+  if (status === 'error') return '저장 실패'
+  return savedAt ? `저장됨 ${savedAt}` : '저장됨'
+}
+function sheetSaveColor(s: SaveStatus) {
   if (s === 'saving') return '#8B6A5A'
   if (s === 'error') return '#D94F35'
   return 'rgba(61,26,46,0.3)'

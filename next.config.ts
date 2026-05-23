@@ -1,8 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   devIndicators: false,
+  transpilePackages: ['@fortune-sheet/react', '@fortune-sheet/core'],
 };
 
 export default nextConfig;

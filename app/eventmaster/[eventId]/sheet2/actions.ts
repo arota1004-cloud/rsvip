@@ -20,7 +20,7 @@ export type FilterRule = {
 export type CustomQuestion = {
   id: string
   text: string
-  type: 'text' | 'select'
+  type: 'text' | 'select' | 'number'
   options?: string[]
   required: boolean
 }
@@ -162,6 +162,44 @@ export async function recordSend(
     sent_to_count: guestIds.length,
     guest_ids: guestIds,
   }])
+}
+
+// ── 인비테이션 발송 후 게스트 시트 업데이트 ───────────────────
+export async function markGuestsAsSent(eventId: string, guestIds: string[], invLabel: string) {
+  if (!guestIds.length) return
+  const insforge = await getInsForge()
+
+  // __inv__ 컬럼이 없으면 guest_sheets에 추가
+  const { data: sheetData } = await insforge.database
+    .from('guest_sheets').select('columns').eq('event_id', eventId).limit(1)
+
+  if (sheetData?.[0]) {
+    type ColItem = { id: string; name: string; width: number; type: string }
+    const cols = (sheetData[0] as { columns: ColItem[] }).columns
+    if (!cols.find(c => c.id === '__inv__')) {
+      await insforge.database.from('guest_sheets')
+        .update({ columns: [...cols, { id: '__inv__', name: '인비테이션 발송', width: 200, type: 'text' }] })
+        .eq('event_id', eventId)
+    }
+  }
+
+  // 현재 게스트 데이터 조회
+  const { data: guests } = await insforge.database
+    .from('guests').select('id, row_index, data').in('id', guestIds)
+
+  if (!guests?.length) return
+
+  // __inv__ 필드 병합 후 일괄 upsert
+  type GuestRecord = { id: string; row_index: number; data: Record<string, string> }
+  const records = (guests as GuestRecord[]).map(g => ({
+    id: g.id,
+    event_id: eventId,
+    row_index: g.row_index,
+    data: { ...g.data, '__inv__': invLabel },
+    updated_at: new Date().toISOString(),
+  }))
+
+  await insforge.database.from('guests').upsert(records, { onConflict: 'id' })
 }
 
 // ── 게스트 토큰 생성 (RSVP / QR) ─────────────────────────────

@@ -6,7 +6,7 @@ import { submitRsvp } from './actions'
 type Question = {
   id: string
   text: string
-  type: 'text' | 'select'
+  type: 'text' | 'select' | 'number'
   options?: string[]
   required: boolean
 }
@@ -148,6 +148,7 @@ export default function RsvpClient({
                     </select>
                   ) : (
                     <input
+                      type={q.type === 'number' ? 'number' : 'text'}
                       value={answers[q.id] ?? ''}
                       onChange={e => setAnswers(prev => ({ ...prev, [q.id]: e.target.value }))}
                       style={{

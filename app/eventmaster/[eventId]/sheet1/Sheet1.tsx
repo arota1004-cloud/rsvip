@@ -1,56 +1,38 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
-import SpreadsheetGrid from './SpreadsheetGrid'
+import { useEffect, useState } from 'react'
+import GuestSheet from './GuestSheet'
 import { loadSheet } from './actions'
 import type { Column, GuestRow } from './actions'
 
-type SaveStatus = 'saved' | 'saving' | 'error'
-
 type Props = {
   eventId: string
-  onSaveStatusChange?: (s: SaveStatus) => void
+  onSaveStatusChange?: (status: 'saved' | 'saving' | 'error', savedAt?: string) => void
   onAlert?: (msg: string, type?: 'warn' | 'error' | 'info') => void
 }
 
 export default function Sheet1({ eventId, onSaveStatusChange, onAlert }: Props) {
-  const [columns, setColumns] = useState<Column[] | null>(null)
-  const [rows, setRows] = useState<GuestRow[] | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [data, setData] = useState<{ columns: Column[]; rows: GuestRow[] } | null>(null)
 
   useEffect(() => {
-    loadSheet(eventId).then(({ columns, rows }) => {
-      setColumns(columns)
-      setRows(rows)
-      setLoading(false)
-    })
+    loadSheet(eventId).then(setData)
   }, [eventId])
 
-  const handleSaveStatus = useCallback((s: SaveStatus) => {
-    onSaveStatusChange?.(s)
-  }, [onSaveStatusChange])
-
-  const handleAlert = useCallback((msg: string, type?: 'warn' | 'error' | 'info') => {
-    onAlert?.(msg, type)
-  }, [onAlert])
-
-  if (loading) {
+  if (!data) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#8B6A5A', fontSize: 13 }}>
+      <div className="flex items-center justify-center h-full text-sm" style={{ color: '#8B6A5A' }}>
         불러오는 중...
       </div>
     )
   }
 
-  if (!columns || !rows) return null
-
   return (
-    <SpreadsheetGrid
+    <GuestSheet
       eventId={eventId}
-      initialColumns={columns}
-      initialRows={rows}
-      onSaveStatusChange={handleSaveStatus}
-      onAlert={handleAlert}
+      initialColumns={data.columns}
+      initialRows={data.rows}
+      onSaveStatusChange={onSaveStatusChange ?? (() => {})}
+      onAlert={onAlert ?? (() => {})}
     />
   )
 }

@@ -9,15 +9,17 @@ type Props = {
   columns: Column[]
   rows: GuestRow[]
   onChange: (rules: FilterRule[]) => void
+  /** compact=true 이면 미리보기 테이블 숨김 */
+  compact?: boolean
 }
 
 const CONDITIONS = [
-  { value: 'eq',          label: '같음' },
-  { value: 'neq',         label: '같지 않음' },
-  { value: 'contains',    label: '포함' },
-  { value: 'not_contains',label: '포함 안 함' },
-  { value: 'is_empty',    label: '비어 있음' },
-  { value: 'is_not_empty',label: '비어 있지 않음' },
+  { value: 'eq',           label: '같음' },
+  { value: 'neq',          label: '같지 않음' },
+  { value: 'contains',     label: '포함' },
+  { value: 'not_contains', label: '포함 안 함' },
+  { value: 'is_empty',     label: '비어 있음' },
+  { value: 'is_not_empty', label: '비어 있지 않음' },
 ] as const
 
 function evalRule(rule: FilterRule, row: GuestRow): boolean {
@@ -45,156 +47,126 @@ function applyFilters(rules: FilterRule[], rows: GuestRow[]): GuestRow[] {
   })
 }
 
-export default function FilterBuilder({ rules, columns, rows, onChange }: Props) {
+export default function FilterBuilder({ rules, columns, rows, onChange, compact }: Props) {
   const [previewOpen, setPreviewOpen] = useState(false)
 
   const filteredRows = useMemo(() => applyFilters(rules, rows), [rules, rows])
 
+  // 이름·이메일·연락처 우선 표시 (최대 4컬럼)
+  const previewCols = useMemo(() => {
+    const priority = ['이름', '이메일', '연락처', '소속']
+    const sorted = [...columns].sort((a, b) => {
+      const ai = priority.indexOf(a.name)
+      const bi = priority.indexOf(b.name)
+      if (ai < 0 && bi < 0) return 0
+      if (ai < 0) return 1
+      if (bi < 0) return -1
+      return ai - bi
+    })
+    return sorted.slice(0, 4)
+  }, [columns])
+
   const addRule = () => {
-    const newRule: FilterRule = {
+    onChange([...rules, {
       id: crypto.randomUUID(),
       columnId: columns[0]?.id ?? '',
       condition: 'contains',
       value: '',
       logic: 'AND',
-    }
-    onChange([...rules, newRule])
+    }])
   }
 
-  const updateRule = (id: string, patch: Partial<FilterRule>) => {
+  const updateRule = (id: string, patch: Partial<FilterRule>) =>
     onChange(rules.map(r => r.id === id ? { ...r, ...patch } : r))
-  }
 
-  const removeRule = (id: string) => {
+  const removeRule = (id: string) =>
     onChange(rules.filter(r => r.id !== id))
-  }
 
-  const noValueConditions: FilterRule['condition'][] = ['is_empty', 'is_not_empty']
+  const noValueConds: FilterRule['condition'][] = ['is_empty', 'is_not_empty']
+
+  const selectStyle: React.CSSProperties = {
+    padding: '4px 6px', fontSize: 12, borderRadius: 6,
+    border: '1px solid rgba(61,26,46,0.2)', backgroundColor: '#fff',
+    color: '#3D1A2E', outline: 'none', cursor: 'pointer',
+  }
 
   return (
     <div className="flex flex-col gap-2">
       {/* 필터 조건 목록 */}
       {rules.map((rule, idx) => (
-        <div key={rule.id} className="flex items-center gap-2 flex-wrap">
-          {/* AND/OR (첫 번째 제외) */}
+        <div key={rule.id} className="flex items-center gap-1.5 flex-wrap">
           {idx > 0 ? (
-            <select
-              value={rule.logic}
+            <select value={rule.logic}
               onChange={e => updateRule(rule.id, { logic: e.target.value as 'AND' | 'OR' })}
-              style={{
-                width: 64, padding: '4px 6px', fontSize: 11, borderRadius: 6,
-                border: '1px solid rgba(61,26,46,0.2)', backgroundColor: '#faf8f4',
-                color: '#3D1A2E', cursor: 'pointer', outline: 'none',
-              }}
-            >
+              style={{ ...selectStyle, width: 58 }}>
               <option value="AND">AND</option>
               <option value="OR">OR</option>
             </select>
           ) : (
-            <span style={{ width: 64, fontSize: 11, color: '#8B6A5A', paddingLeft: 6, flexShrink: 0 }}>
-              조건
-            </span>
+            <span style={{ width: 58, fontSize: 11, color: '#8B6A5A', paddingLeft: 4, flexShrink: 0 }}>조건</span>
           )}
 
-          {/* 컬럼 선택 */}
-          <select
-            value={rule.columnId}
+          <select value={rule.columnId}
             onChange={e => updateRule(rule.id, { columnId: e.target.value })}
-            style={{
-              flex: '1 1 100px', minWidth: 80, padding: '4px 6px', fontSize: 12,
-              borderRadius: 6, border: '1px solid rgba(61,26,46,0.2)',
-              backgroundColor: '#fff', color: '#3D1A2E', outline: 'none',
-            }}
-          >
-            {columns.map(col => (
-              <option key={col.id} value={col.id}>{col.name}</option>
-            ))}
+            style={{ ...selectStyle, flex: '1 1 90px', minWidth: 72 }}>
+            {columns.map(col => <option key={col.id} value={col.id}>{col.name}</option>)}
           </select>
 
-          {/* 조건 선택 */}
-          <select
-            value={rule.condition}
+          <select value={rule.condition}
             onChange={e => updateRule(rule.id, { condition: e.target.value as FilterRule['condition'] })}
-            style={{
-              flex: '1 1 110px', minWidth: 90, padding: '4px 6px', fontSize: 12,
-              borderRadius: 6, border: '1px solid rgba(61,26,46,0.2)',
-              backgroundColor: '#fff', color: '#3D1A2E', outline: 'none',
-            }}
-          >
-            {CONDITIONS.map(c => (
-              <option key={c.value} value={c.value}>{c.label}</option>
-            ))}
+            style={{ ...selectStyle, flex: '1 1 100px', minWidth: 80 }}>
+            {CONDITIONS.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
           </select>
 
-          {/* 값 입력 (is_empty / is_not_empty는 숨김) */}
-          {!noValueConditions.includes(rule.condition) && (
-            <input
-              value={rule.value}
+          {!noValueConds.includes(rule.condition) && (
+            <input value={rule.value}
               onChange={e => updateRule(rule.id, { value: e.target.value })}
               placeholder="값 입력"
               style={{
-                flex: '2 1 120px', minWidth: 80, padding: '4px 8px', fontSize: 12,
-                borderRadius: 6, border: '1px solid rgba(61,26,46,0.2)',
-                outline: 'none', color: '#3D1A2E',
+                flex: '2 1 100px', minWidth: 72, padding: '4px 8px', fontSize: 12,
+                borderRadius: 6, border: '1px solid rgba(61,26,46,0.2)', outline: 'none', color: '#3D1A2E',
               }}
               onFocus={e => (e.target.style.borderColor = '#D94F35')}
               onBlur={e => (e.target.style.borderColor = 'rgba(61,26,46,0.2)')}
             />
           )}
 
-          {/* 삭제 */}
-          <button
-            onClick={() => removeRule(rule.id)}
-            title="조건 삭제"
-            style={{
-              background: 'none', border: 'none', cursor: 'pointer',
-              fontSize: 14, color: 'rgba(61,26,46,0.35)', padding: '2px 4px', flexShrink: 0,
-            }}
+          <button onClick={() => removeRule(rule.id)} title="조건 삭제"
+            style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, color: 'rgba(61,26,46,0.35)', padding: '2px 4px', flexShrink: 0 }}
             onMouseEnter={e => (e.currentTarget.style.color = '#D94F35')}
-            onMouseLeave={e => (e.currentTarget.style.color = 'rgba(61,26,46,0.35)')}
-          >✕</button>
+            onMouseLeave={e => (e.currentTarget.style.color = 'rgba(61,26,46,0.35)')}>✕</button>
         </div>
       ))}
 
-      {/* 조건 추가 버튼 */}
-      <button
-        onClick={addRule}
+      <button onClick={addRule}
         style={{
-          alignSelf: 'flex-start', padding: '4px 12px', fontSize: 12,
+          alignSelf: 'flex-start', padding: '3px 10px', fontSize: 12,
           borderRadius: 6, border: '1px dashed rgba(61,26,46,0.25)',
           background: 'none', color: '#8B6A5A', cursor: 'pointer',
         }}
         onMouseEnter={e => { e.currentTarget.style.borderColor = '#D94F35'; e.currentTarget.style.color = '#D94F35' }}
-        onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(61,26,46,0.25)'; e.currentTarget.style.color = '#8B6A5A' }}
-      >
+        onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(61,26,46,0.25)'; e.currentTarget.style.color = '#8B6A5A' }}>
         + 조건 추가
       </button>
 
-      {/* 대상자 수 + 미리보기 토글 */}
-      {rows.length > 0 && (
+      {/* 대상자 수 + 미리보기 (compact 모드에선 숨김) */}
+      {!compact && rows.length > 0 && (
         <div style={{ marginTop: 4 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div className="flex items-center gap-2.5">
             <span style={{ fontSize: 12, color: '#3D1A2E' }}>
               대상자{' '}
               <strong style={{ color: rules.length > 0 ? '#D94F35' : '#3D1A2E' }}>
                 {filteredRows.length}
-              </strong>
-              /{rows.length}명
+              </strong>/{rows.length}명
             </span>
             {filteredRows.length > 0 && (
-              <button
-                onClick={() => setPreviewOpen(v => !v)}
-                style={{
-                  fontSize: 11, color: '#8B6A5A', background: 'none',
-                  border: 'none', cursor: 'pointer', padding: 0, textDecoration: 'underline',
-                }}
-              >
+              <button onClick={() => setPreviewOpen(v => !v)}
+                style={{ fontSize: 11, color: '#8B6A5A', background: 'none', border: 'none', cursor: 'pointer', padding: 0, textDecoration: 'underline' }}>
                 {previewOpen ? '미리보기 닫기' : '미리보기'}
               </button>
             )}
           </div>
 
-          {/* 대상자 미리보기 테이블 */}
           {previewOpen && filteredRows.length > 0 && (
             <div style={{
               marginTop: 8, border: '1px solid rgba(61,26,46,0.12)',
@@ -204,7 +176,7 @@ export default function FilterBuilder({ rules, columns, rows, onChange }: Props)
                 <thead>
                   <tr style={{ backgroundColor: '#F0EBE1' }}>
                     <th style={{ padding: '5px 10px', textAlign: 'left', color: '#8B6A5A', fontWeight: 600, borderBottom: '1px solid rgba(61,26,46,0.1)', width: 32 }}>#</th>
-                    {columns.slice(0, 4).map(col => (
+                    {previewCols.map(col => (
                       <th key={col.id} style={{ padding: '5px 10px', textAlign: 'left', color: '#8B6A5A', fontWeight: 600, borderBottom: '1px solid rgba(61,26,46,0.1)', whiteSpace: 'nowrap' }}>
                         {col.name}
                       </th>
@@ -215,7 +187,7 @@ export default function FilterBuilder({ rules, columns, rows, onChange }: Props)
                   {filteredRows.slice(0, 50).map((row, i) => (
                     <tr key={row.id} style={{ backgroundColor: i % 2 === 0 ? '#fff' : '#faf8f4' }}>
                       <td style={{ padding: '4px 10px', color: '#8B6A5A', borderBottom: '1px solid rgba(61,26,46,0.06)' }}>{i + 1}</td>
-                      {columns.slice(0, 4).map(col => (
+                      {previewCols.map(col => (
                         <td key={col.id} style={{ padding: '4px 10px', color: '#3D1A2E', borderBottom: '1px solid rgba(61,26,46,0.06)', maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {row.data[col.id] ?? ''}
                         </td>
@@ -224,7 +196,7 @@ export default function FilterBuilder({ rules, columns, rows, onChange }: Props)
                   ))}
                   {filteredRows.length > 50 && (
                     <tr>
-                      <td colSpan={5} style={{ padding: '6px 10px', color: '#8B6A5A', fontSize: 11, textAlign: 'center' }}>
+                      <td colSpan={previewCols.length + 1} style={{ padding: '6px 10px', color: '#8B6A5A', fontSize: 11, textAlign: 'center' }}>
                         … 외 {filteredRows.length - 50}명
                       </td>
                     </tr>
