@@ -8,10 +8,11 @@ import {
   saveRsvpSettings, recordSend, generateGuestTokens, markGuestsAsSent,
 } from '../actions'
 import { loadSheet } from '../../sheet1/actions'
+import { generateRsvpLink } from '@/lib/rsvp'
+import GuestQR from '@/components/QRCode/GuestQR'
 import VariationList from '../VariationList'
 import FilterBuilder from '../FilterBuilder'
 import SendHistoryPanel from '../SendHistoryPanel'
-import RsvpSettings from '../RsvpSettings'
 import TipTapEditor from './TipTapEditor'
 
 type SaveStatus = 'saved' | 'saving' | 'error'
@@ -21,6 +22,7 @@ type Props = {
   eventId: string
   onSaveStatusChange: (s: SaveStatus) => void
   onAlert: (msg: string, type?: 'warn' | 'error' | 'info') => void
+  confirmedInviteEnabled?: boolean  // QR 토큰 활성화 여부 (Sheet3 설정 연동)
 }
 
 // ─── 필터 평가 ────────────────────────────────────────────────────────────────
@@ -49,25 +51,22 @@ function applyFilters(rules: FilterRule[], rows: GuestRow[]): GuestRow[] {
 }
 
 // ─── 토큰 치환 ────────────────────────────────────────────────────────────────
+// {QR}는 React 컴포넌트로 렌더링하기 위해 플레이스홀더로 변환
+const QR_PLACEHOLDER = '___RSVIP_QR___'
+
 function applyTokens(html: string, sampleRow: Record<string, string>): string {
   let result = html.replace(
     /<span[^>]*data-token="([^"]*)"[^>]*>[^<]*<\/span>/g,
-    (_, name) => sampleRow[name] ?? `{${name}}`
+    (_, name) => {
+      if (name === 'QR') return QR_PLACEHOLDER
+      return sampleRow[name] ?? `{${name}}`
+    }
   )
   Object.entries(sampleRow).forEach(([name, value]) => {
     result = result.replaceAll(`{${name}}`, value)
   })
-  return result
-}
-
-// QR 이미지 포함 토큰 치환 (미리보기용)
-function applyTokensWithQr(html: string, sampleRow: Record<string, string>, qrUrl: string): string {
-  const qrImg = qrUrl
-    ? `<img src="${qrUrl}" width="100" height="100" style="display:block;margin:8px auto;border-radius:4px;" alt="QR" />`
-    : `<span style="display:inline-flex;align-items:center;justify-content:center;width:80px;height:80px;border:2px dashed rgba(61,26,46,0.3);border-radius:4px;font-size:9px;color:rgba(61,26,46,0.4);">QR</span>`
-  let result = applyTokens(html, sampleRow)
-  result = result.replace(/<span[^>]*data-token="QR"[^>]*>[^<]*<\/span>/g, qrImg)
-  result = result.replace(/\{QR\}/g, qrImg)
+  // 플레인 텍스트 {QR}도 플레이스홀더로
+  result = result.replaceAll('{QR}', QR_PLACEHOLDER)
   return result
 }
 
@@ -128,7 +127,7 @@ function ThumbnailZone({ src, onChange }: { src: string; onChange: (src: string)
 // ─── 메인 컴포넌트 ────────────────────────────────────────────────────────────
 const APP_URL = typeof window !== 'undefined' ? window.location.origin : ''
 
-export default function InvitationSheet({ eventId, onSaveStatusChange, onAlert }: Props) {
+export default function InvitationSheet({ eventId, onSaveStatusChange, onAlert, confirmedInviteEnabled = false }: Props) {
   const [invitations, setInvitations] = useState<Invitation[]>([])
   const [history, setHistory]         = useState<SendRecord[]>([])
   const [columns, setColumns]         = useState<Column[]>([])
@@ -142,7 +141,6 @@ export default function InvitationSheet({ eventId, onSaveStatusChange, onAlert }
   const [qrDataUrl, setQrDataUrl]     = useState('')
   const [showQrModal, setShowQrModal] = useState(false)
   const [thumbnail, setThumbnail]     = useState<Record<string, string>>({})
-  const [sampleQrUrl, setSampleQrUrl] = useState('')   // 미리보기용 QR
 
   // 발송 설정 상태
   const [channel, setChannel]         = useState<Channel>('email')
@@ -177,17 +175,23 @@ export default function InvitationSheet({ eventId, onSaveStatusChange, onAlert }
     return map
   }, [rows, columns])
 
-  const tokenNames = [...columns.map(c => c.name), 'QR']
+  const tokenNames = columns.map(c => c.name)
 
-  // ─ 미리보기용 QR 생성 ─────────────────────────────────────────────────────
-  useEffect(() => {
-    const guestId   = rows[0]?.id ?? 'preview'
-    const guestName = sampleRow['이름'] ?? ''
-    const payload   = JSON.stringify({ guestId, name: guestName, eventId })
-    import('qrcode').then(mod => {
-      mod.default.toDataURL(payload, { width: 100, margin: 1, color: { dark: '#3D1A2E', light: '#fff' } }).then(setSampleQrUrl)
-    })
-  }, [rows, eventId, sampleRow])
+  // 이름 컬럼 ID (링크 미리보기 이름 표시용)
+  const nameColId = useMemo(
+    () => columns.find(c => c.name === '이름')?.id ?? '',
+    [columns]
+  )
+
+  // 전체 링크 클립보드 복사 (이름 | URL 형식)
+  const copyAllLinks = useCallback(async () => {
+    const text = filteredRows.map(row => {
+      const name = nameColId ? (row.data[nameColId] ?? '게스트') : '게스트'
+      return `${name} | ${APP_URL}${generateRsvpLink(eventId, row.id)}`
+    }).join('\n')
+    await navigator.clipboard.writeText(text)
+    onAlert(`${filteredRows.length}개 링크가 클립보드에 복사됐습니다.`, 'info')
+  }, [filteredRows, nameColId, eventId, onAlert])
 
   // ─ 자동저장 ──────────────────────────────────────────────────────────────────
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -256,9 +260,12 @@ export default function InvitationSheet({ eventId, onSaveStatusChange, onAlert }
         const guestIds = filteredRows.map(r => r.id)
 
         if (channel === 'link') {
-          const tokens = await generateGuestTokens(eventId, guestIds, 'rsvp')
-          const links = tokens.map(t => `${APP_URL}/rsvp/${eventId}/${t.token}`).join('\n')
-          await navigator.clipboard.writeText(links)
+          // 이름 | URL 형식으로 전체 복사
+          const text = filteredRows.map(row => {
+            const name = nameColId ? (row.data[nameColId] ?? '게스트') : '게스트'
+            return `${name} | ${APP_URL}${generateRsvpLink(eventId, row.id)}`
+          }).join('\n')
+          await navigator.clipboard.writeText(text)
         }
 
         await recordSend(eventId, activeInv.id, channel, guestIds)
@@ -288,20 +295,43 @@ export default function InvitationSheet({ eventId, onSaveStatusChange, onAlert }
     if (!activeInv || filteredRows.length === 0) return
     const tokens = await generateGuestTokens(eventId, filteredRows.map(r => r.id), 'qr_checkin')
     if (!tokens.length) return
-    // QR 내용: { guestId, name, eventId } JSON
-    const firstGuest = filteredRows[0]
-    const guestName  = firstGuest
-      ? (Object.values(firstGuest.data)[0] ?? '')
-      : ''
-    const payload = JSON.stringify({ guestId: tokens[0].guest_id, name: guestName, eventId })
     const QRCode = (await import('qrcode')).default
-    setQrDataUrl(await QRCode.toDataURL(payload, { width: 240, margin: 2, color: { dark: '#3D1A2E', light: '#fff' } }))
+    setQrDataUrl(await QRCode.toDataURL(`${APP_URL}/checkin/${tokens[0].token}`, { width: 240, margin: 2 }))
     setShowQrModal(true)
   }
 
-  const handleSaveRsvp = useCallback(async (enabled: boolean, qs: CustomQuestion[]) => {
-    await saveRsvpSettings(eventId, enabled, qs)
+  const handleSaveRsvp = useCallback(async (enabled: boolean, questions: CustomQuestion[]) => {
+    await saveRsvpSettings(eventId, enabled, questions)
   }, [eventId])
+
+  // ─ RSVP 문항 관리 ────────────────────────────────────────────────────────────
+  const moveQuestion = useCallback((idx: number, dir: -1 | 1) => {
+    const target = idx + dir
+    if (target < 0 || target >= customQuestions.length) return
+    const next = [...customQuestions]
+    const temp = next[idx]; next[idx] = next[target]; next[target] = temp
+    setCustomQuestions(next)
+    handleSaveRsvp(rsvpEnabled, next)
+  }, [customQuestions, rsvpEnabled, handleSaveRsvp])
+
+  const updateQuestion = useCallback((id: string, patch: Partial<CustomQuestion>) => {
+    const next = customQuestions.map(q => q.id === id ? { ...q, ...patch } : q)
+    setCustomQuestions(next)
+    handleSaveRsvp(rsvpEnabled, next)
+  }, [customQuestions, rsvpEnabled, handleSaveRsvp])
+
+  const removeQuestion = useCallback((id: string) => {
+    const next = customQuestions.filter(q => q.id !== id)
+    setCustomQuestions(next)
+    handleSaveRsvp(rsvpEnabled, next)
+  }, [customQuestions, rsvpEnabled, handleSaveRsvp])
+
+  const addQuestion = useCallback(() => {
+    const q: CustomQuestion = { id: crypto.randomUUID(), text: '', type: 'short', required: false }
+    const next = [...customQuestions, q]
+    setCustomQuestions(next)
+    handleSaveRsvp(rsvpEnabled, next)
+  }, [customQuestions, rsvpEnabled, handleSaveRsvp])
 
   if (loading) {
     return <div className="flex items-center justify-center h-full text-sm" style={{ color: '#8B6A5A' }}>불러오는 중...</div>
@@ -372,6 +402,7 @@ export default function InvitationSheet({ eventId, onSaveStatusChange, onAlert }
                     onChange={html => patchActive({ html_content: html })}
                     availableTokens={tokenNames}
                     sampleRow={sampleRow}
+                    confirmedInviteEnabled={confirmedInviteEnabled}
                   />
                 </div>
               </div>
@@ -461,7 +492,7 @@ export default function InvitationSheet({ eventId, onSaveStatusChange, onAlert }
                       </div>
                     </div>
 
-                    {/* 발송자명 (이메일 채널만 표시) */}
+                    {/* 발송자명 (이메일 채널만) */}
                     {channel === 'email' && (
                       <div>
                         <p style={{ fontSize: 11, fontWeight: 600, color: '#8B6A5A', margin: '0 0 6px', letterSpacing: 0.3 }}>
@@ -479,6 +510,71 @@ export default function InvitationSheet({ eventId, onSaveStatusChange, onAlert }
                           onFocus={e => (e.target.style.borderColor = '#D94F35')}
                           onBlur={e => (e.target.style.borderColor = 'rgba(61,26,46,0.2)')}
                         />
+                      </div>
+                    )}
+
+                    {/* 링크 미리보기 (링크 복사 채널만) */}
+                    {channel === 'link' && filteredRows.length > 0 && (
+                      <div>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                          <p style={{ fontSize: 11, fontWeight: 600, color: '#8B6A5A', margin: 0, letterSpacing: 0.3 }}>
+                            링크 미리보기 ({filteredRows.length}개)
+                          </p>
+                          <button
+                            onClick={copyAllLinks}
+                            style={{
+                              padding: '3px 10px', fontSize: 11, fontWeight: 600, borderRadius: 6,
+                              border: '1px solid rgba(61,26,46,0.2)', background: 'none', cursor: 'pointer', color: '#3D1A2E',
+                            }}
+                            onMouseEnter={e => { e.currentTarget.style.borderColor = '#D94F35'; e.currentTarget.style.color = '#D94F35' }}
+                            onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(61,26,46,0.2)'; e.currentTarget.style.color = '#3D1A2E' }}>
+                            📋 전체 복사
+                          </button>
+                        </div>
+                        <div style={{
+                          maxHeight: 148, overflowY: 'auto',
+                          border: '1px solid rgba(61,26,46,0.1)', borderRadius: 8, overflow: 'hidden',
+                        }}>
+                          {filteredRows.slice(0, 50).map((row, idx) => {
+                            const name = nameColId ? (row.data[nameColId] ?? '게스트') : '게스트'
+                            const link = generateRsvpLink(eventId, row.id)
+                            const fullLink = `${APP_URL}${link}`
+                            return (
+                              <div key={row.id} style={{
+                                display: 'flex', alignItems: 'center', gap: 6, padding: '5px 8px',
+                                backgroundColor: idx % 2 === 0 ? '#fff' : '#fafaf8',
+                                borderBottom: '1px solid rgba(61,26,46,0.06)',
+                              }}>
+                                <span style={{ width: 18, fontSize: 10, color: '#8B6A5A', textAlign: 'right', flexShrink: 0 }}>
+                                  {idx + 1}
+                                </span>
+                                <span style={{ width: 68, fontSize: 11, fontWeight: 500, color: '#3D1A2E', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                                  {name}
+                                </span>
+                                <span style={{ flex: 1, fontSize: 10, color: '#8B6A5A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                  {link}
+                                </span>
+                                <button
+                                  onClick={() => navigator.clipboard.writeText(fullLink)}
+                                  title="이 링크 복사"
+                                  style={{
+                                    padding: '2px 7px', fontSize: 10, borderRadius: 4, flexShrink: 0,
+                                    border: '1px solid rgba(61,26,46,0.15)', background: 'none',
+                                    cursor: 'pointer', color: '#8B6A5A',
+                                  }}
+                                  onMouseEnter={e => { e.currentTarget.style.borderColor = '#D94F35'; e.currentTarget.style.color = '#D94F35' }}
+                                  onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(61,26,46,0.15)'; e.currentTarget.style.color = '#8B6A5A' }}>
+                                  복사
+                                </button>
+                              </div>
+                            )
+                          })}
+                          {filteredRows.length > 50 && (
+                            <div style={{ padding: '5px 10px', fontSize: 10, color: '#8B6A5A', textAlign: 'center', backgroundColor: '#faf8f4' }}>
+                              … 외 {filteredRows.length - 50}명
+                            </div>
+                          )}
+                        </div>
                       </div>
                     )}
 
@@ -519,14 +615,134 @@ export default function InvitationSheet({ eventId, onSaveStatusChange, onAlert }
           {/* ── RSVP 설정 탭 ─────────────────────────────────────────────────── */}
           {rightTab === 'rsvp' && (
             <div style={{ flex: 1, overflowY: 'auto', padding: 20 }}>
-              <RsvpSettings
-                enabled={rsvpEnabled}
-                questions={customQuestions}
-                onToggleEnabled={() => {
+
+              {/* RSVP 수집 ON/OFF */}
+              <div style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                padding: '14px 16px', borderRadius: 10, border: '1px solid rgba(61,26,46,0.12)',
+                backgroundColor: '#fff', marginBottom: 20,
+              }}>
+                <div>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: '#3D1A2E', margin: 0 }}>RSVP 응답 수집</p>
+                  <p style={{ fontSize: 11, color: '#8B6A5A', margin: '2px 0 0' }}>게스트가 링크로 참석 여부를 응답합니다.</p>
+                </div>
+                <ToggleSwitch checked={rsvpEnabled} onChange={() => {
                   const next = !rsvpEnabled; setRsvpEnabled(next); handleSaveRsvp(next, customQuestions)
-                }}
-                onChange={next => { setCustomQuestions(next); handleSaveRsvp(rsvpEnabled, next) }}
-              />
+                }} />
+              </div>
+
+              {rsvpEnabled && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+                  {/* 기본 문항 (고정) */}
+                  <div>
+                    <p style={{ fontSize: 11, fontWeight: 700, color: '#8B6A5A', margin: '0 0 8px', letterSpacing: 0.5, textTransform: 'uppercase' }}>
+                      기본 문항
+                    </p>
+                    <div style={{
+                      display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px',
+                      borderRadius: 10, border: '1px solid rgba(61,26,46,0.08)',
+                      backgroundColor: 'rgba(61,26,46,0.025)',
+                    }}>
+                      <span style={{ fontSize: 18, flexShrink: 0 }}>🔒</span>
+                      <div style={{ flex: 1 }}>
+                        <p style={{ fontSize: 12, fontWeight: 600, color: 'rgba(61,26,46,0.45)', margin: 0 }}>참석 여부</p>
+                        <p style={{ fontSize: 11, color: 'rgba(61,26,46,0.35)', margin: '2px 0 0' }}>
+                          참석 / 불참 응답 — 수정·삭제 불가
+                        </p>
+                      </div>
+                      <span style={{
+                        fontSize: 10, padding: '2px 8px', borderRadius: 9999,
+                        backgroundColor: 'rgba(61,26,46,0.07)', color: 'rgba(61,26,46,0.35)', fontWeight: 600,
+                      }}>필수</span>
+                    </div>
+                  </div>
+
+                  {/* 추가 문항 */}
+                  <div>
+                    <p style={{ fontSize: 11, fontWeight: 700, color: '#8B6A5A', margin: '0 0 8px', letterSpacing: 0.5, textTransform: 'uppercase' }}>
+                      추가 문항 ({customQuestions.length})
+                    </p>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      {customQuestions.map((q, idx) => (
+                        <div key={q.id} style={{
+                          border: '1px solid rgba(61,26,46,0.12)', borderRadius: 10,
+                          backgroundColor: '#fff', padding: '10px 12px',
+                          boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                        }}>
+                          {/* 상단: 순서 버튼 + 텍스트 + 타입 + 삭제 */}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                            {/* 위/아래 */}
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flexShrink: 0 }}>
+                              <ArrowBtn dir="up" disabled={idx === 0}
+                                onClick={() => moveQuestion(idx, -1)} />
+                              <ArrowBtn dir="down" disabled={idx === customQuestions.length - 1}
+                                onClick={() => moveQuestion(idx, 1)} />
+                            </div>
+
+                            {/* 문항 텍스트 */}
+                            <input
+                              value={q.text}
+                              onChange={e => updateQuestion(q.id, { text: e.target.value })}
+                              placeholder="문항을 입력하세요"
+                              style={{
+                                flex: 1, padding: '6px 10px', fontSize: 12, borderRadius: 7,
+                                border: '1px solid rgba(61,26,46,0.15)', outline: 'none',
+                                color: '#3D1A2E', backgroundColor: '#fafaf8',
+                              }}
+                              onFocus={e => (e.target.style.borderColor = '#D94F35')}
+                              onBlur={e => (e.target.style.borderColor = 'rgba(61,26,46,0.15)')}
+                            />
+
+                            {/* 타입 드롭다운 */}
+                            <select
+                              value={q.type === 'text' ? 'short' : q.type}
+                              onChange={e => updateQuestion(q.id, { type: e.target.value as CustomQuestion['type'] })}
+                              style={{
+                                padding: '6px 8px', fontSize: 11, borderRadius: 7, flexShrink: 0,
+                                border: '1px solid rgba(61,26,46,0.15)', outline: 'none',
+                                backgroundColor: '#fafaf8', color: '#3D1A2E', cursor: 'pointer',
+                              }}>
+                              <option value="short">단답형</option>
+                              <option value="select">선택형</option>
+                              <option value="number">숫자</option>
+                            </select>
+
+                            {/* 삭제 */}
+                            <button onClick={() => removeQuestion(q.id)}
+                              style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 15, color: 'rgba(61,26,46,0.3)', padding: '2px 4px', flexShrink: 0 }}
+                              onMouseEnter={e => (e.currentTarget.style.color = '#D94F35')}
+                              onMouseLeave={e => (e.currentTarget.style.color = 'rgba(61,26,46,0.3)')}>✕</button>
+                          </div>
+
+                          {/* 하단: 필수 여부 */}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 8, paddingLeft: 28 }}>
+                            <span style={{ fontSize: 11, color: '#8B6A5A' }}>필수 응답</span>
+                            <ToggleSwitch
+                              checked={q.required}
+                              onChange={() => updateQuestion(q.id, { required: !q.required })}
+                              small
+                            />
+                          </div>
+                        </div>
+                      ))}
+
+                      {/* + 문항 추가 */}
+                      <button onClick={addQuestion}
+                        style={{
+                          padding: '10px 0', fontSize: 12, color: '#8B6A5A',
+                          background: 'none', border: '1px dashed rgba(61,26,46,0.2)',
+                          borderRadius: 10, cursor: 'pointer', width: '100%', marginTop: 2,
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.borderColor = '#D94F35'; e.currentTarget.style.color = '#D94F35' }}
+                        onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(61,26,46,0.2)'; e.currentTarget.style.color = '#8B6A5A' }}>
+                        + 문항 추가
+                      </button>
+                    </div>
+                  </div>
+
+                </div>
+              )}
             </div>
           )}
 
@@ -552,9 +768,15 @@ export default function InvitationSheet({ eventId, onSaveStatusChange, onAlert }
         <div style={{ flex: 1, overflowY: 'auto', padding: 16 }}>
           {activeInv ? (
             <div style={{ backgroundColor: '#fff', borderRadius: 12, padding: 24, boxShadow: '0 2px 12px rgba(0,0,0,0.07)', minHeight: 300 }}>
-              <div style={{ fontSize: 14, lineHeight: 1.7, color: '#3D1A2E' }}
-                dangerouslySetInnerHTML={{ __html: applyTokensWithQr(activeInv.html_content, sampleRow, sampleQrUrl) }} />
-              {!activeInv.html_content && (
+              {activeInv.html_content ? (
+                <PreviewContent
+                  html={applyTokens(activeInv.html_content, sampleRow)}
+                  sampleRow={sampleRow}
+                  eventId={eventId}
+                  guestId={rows[0]?.id ?? ''}
+                  confirmedInviteEnabled={confirmedInviteEnabled}
+                />
+              ) : (
                 <p style={{ color: 'rgba(61,26,46,0.3)', fontSize: 13, textAlign: 'center', marginTop: 40 }}>
                   에디터에서 초대장을 작성하면 여기에 미리보기가 표시됩니다
                 </p>
@@ -647,6 +869,51 @@ export default function InvitationSheet({ eventId, onSaveStatusChange, onAlert }
   )
 }
 
+// ─── 프리뷰 렌더러 (QR 플레이스홀더 분할 처리) ───────────────────────────────
+function PreviewContent({
+  html, sampleRow, eventId, guestId, confirmedInviteEnabled,
+}: {
+  html: string
+  sampleRow: Record<string, string>
+  eventId: string
+  guestId: string
+  confirmedInviteEnabled: boolean
+}) {
+  const parts = html.split(QR_PLACEHOLDER)
+
+  if (parts.length === 1) {
+    return (
+      <div style={{ fontSize: 14, lineHeight: 1.7, color: '#3D1A2E' }}
+        dangerouslySetInnerHTML={{ __html: html }} />
+    )
+  }
+
+  const guestName = sampleRow['이름'] ?? '게스트'
+
+  return (
+    <div style={{ fontSize: 14, lineHeight: 1.7, color: '#3D1A2E' }}>
+      {parts.map((part, i) => (
+        <span key={i}>
+          <span dangerouslySetInnerHTML={{ __html: part }} />
+          {i < parts.length - 1 && (
+            confirmedInviteEnabled ? (
+              <GuestQR guestName={guestName} guestId={guestId} eventId={eventId} />
+            ) : (
+              <span style={{
+                display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 10px',
+                border: '1px dashed rgba(61,26,46,0.2)', borderRadius: 6,
+                fontSize: 11, color: 'rgba(61,26,46,0.35)',
+              }}>
+                📷 QR 🔒 확정 인비테이션 비활성
+              </span>
+            )
+          )}
+        </span>
+      ))}
+    </div>
+  )
+}
+
 // ─── 헬퍼 컴포넌트 ────────────────────────────────────────────────────────────
 function InfoRow({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
   return (
@@ -659,3 +926,42 @@ function InfoRow({ label, value, highlight }: { label: string; value: string; hi
   )
 }
 
+function ToggleSwitch({ checked, onChange, small }: { checked: boolean; onChange: () => void; small?: boolean }) {
+  const w = small ? 30 : 40, h = small ? 17 : 22, r = small ? 8 : 11
+  const knob = small ? 11 : 16, gap = 3
+  return (
+    <button role="switch" aria-checked={checked} onClick={onChange}
+      style={{
+        position: 'relative', width: w, height: h, borderRadius: r, flexShrink: 0,
+        backgroundColor: checked ? '#D94F35' : 'rgba(61,26,46,0.2)',
+        border: 'none', cursor: 'pointer', transition: 'background 0.2s',
+      }}>
+      <span style={{
+        position: 'absolute', top: gap, left: checked ? (w - knob - gap) : gap,
+        width: knob, height: knob, borderRadius: '50%', backgroundColor: '#fff',
+        transition: 'left 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+      }} />
+    </button>
+  )
+}
+
+function ArrowBtn({ dir, disabled, onClick }: { dir: 'up' | 'down'; disabled: boolean; onClick: () => void }) {
+  return (
+    <button
+      disabled={disabled}
+      onClick={onClick}
+      style={{
+        width: 20, height: 17, fontSize: 8, borderRadius: 4, flexShrink: 0,
+        border: '1px solid rgba(61,26,46,0.14)', background: 'none',
+        cursor: disabled ? 'not-allowed' : 'pointer',
+        color: disabled ? 'rgba(61,26,46,0.18)' : '#8B6A5A',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        lineHeight: 1,
+      }}
+      onMouseEnter={e => { if (!disabled) e.currentTarget.style.color = '#D94F35' }}
+      onMouseLeave={e => { e.currentTarget.style.color = disabled ? 'rgba(61,26,46,0.18)' : '#8B6A5A' }}
+    >
+      {dir === 'up' ? '▲' : '▼'}
+    </button>
+  )
+}

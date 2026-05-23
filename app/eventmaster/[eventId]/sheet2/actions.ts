@@ -20,7 +20,7 @@ export type FilterRule = {
 export type CustomQuestion = {
   id: string
   text: string
-  type: 'text' | 'select' | 'number'
+  type: 'text' | 'short' | 'select' | 'number'  // 'text' = legacy alias for 'short'
   options?: string[]
   required: boolean
 }

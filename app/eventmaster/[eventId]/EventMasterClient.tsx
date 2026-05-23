@@ -78,6 +78,7 @@ export default function EventMasterClient({ event }: Props) {
             eventId={event.id}
             onSaveStatusChange={() => {}}
             onAlert={addAlert}
+            confirmedInviteEnabled={Boolean(event.settings?.confirmedInviteEnabled)}
           />
         )}
         {activeTab === 3 && <Sheet3 eventId={event.id} onAlert={addAlert} />}

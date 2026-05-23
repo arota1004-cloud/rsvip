@@ -57,6 +57,7 @@ type Props = {
   availableTokens: string[]
   sampleRow: Record<string, string>  // colName → sample value (for preview mode)
   readOnly?: boolean
+  confirmedInviteEnabled?: boolean   // QR 토큰 버튼 활성화 여부
 }
 
 type EditorHandle = {
@@ -65,7 +66,7 @@ type EditorHandle = {
 }
 
 // ─── 메인 에디터 컴포넌트 ─────────────────────────────────────────────────────
-export default function TipTapEditor({ html, onChange, availableTokens, sampleRow, readOnly = false }: Props) {
+export default function TipTapEditor({ html, onChange, availableTokens, sampleRow, readOnly = false, confirmedInviteEnabled = false }: Props) {
   const isDraggingRef = useRef(false)
   const handleRef = useRef<EditorHandle | null>(null)
 
@@ -174,30 +175,53 @@ export default function TipTapEditor({ html, onChange, availableTokens, sampleRo
           <Div />
 
           {/* 변수 토큰 버튼들 */}
-          {availableTokens.length > 0 && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 3, flexWrap: 'wrap' }}>
-              <span style={{ fontSize: 10, color: 'rgba(61,26,46,0.4)', marginRight: 2 }}>변수:</span>
-              {availableTokens.map(name => (
-                <button
-                  key={name}
-                  onMouseDown={e => {
-                    e.preventDefault()
-                    editor.chain().focus().insertContent({ type: 'token', attrs: { name } }).run()
-                  }}
-                  style={{
-                    padding: '1px 8px', fontSize: 11, borderRadius: 9999,
-                    border: '1px solid rgba(217,79,53,0.4)',
-                    backgroundColor: 'rgba(217,79,53,0.06)',
-                    color: '#D94F35', fontWeight: 600, cursor: 'pointer',
-                  }}
-                  onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'rgba(217,79,53,0.14)')}
-                  onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'rgba(217,79,53,0.06)')}
-                >
-                  {name}
-                </button>
-              ))}
-            </div>
-          )}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 3, flexWrap: 'wrap' }}>
+            {availableTokens.length > 0 && (
+              <>
+                <span style={{ fontSize: 10, color: 'rgba(61,26,46,0.4)', marginRight: 2 }}>변수:</span>
+                {availableTokens.map(name => (
+                  <button
+                    key={name}
+                    onMouseDown={e => {
+                      e.preventDefault()
+                      editor.chain().focus().insertContent({ type: 'token', attrs: { name } }).run()
+                    }}
+                    style={{
+                      padding: '1px 8px', fontSize: 11, borderRadius: 9999,
+                      border: '1px solid rgba(217,79,53,0.4)',
+                      backgroundColor: 'rgba(217,79,53,0.06)',
+                      color: '#D94F35', fontWeight: 600, cursor: 'pointer',
+                    }}
+                    onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'rgba(217,79,53,0.14)')}
+                    onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'rgba(217,79,53,0.06)')}
+                  >
+                    {name}
+                  </button>
+                ))}
+                <Div />
+              </>
+            )}
+            {/* QR 토큰 버튼 — 확정 인비테이션 ON일 때만 활성 */}
+            <button
+              title={confirmedInviteEnabled ? 'QR 체크인 코드 삽입' : '기본 설정 > 확정 인비테이션을 먼저 활성화하세요'}
+              onMouseDown={e => {
+                e.preventDefault()
+                if (!confirmedInviteEnabled) return
+                editor.chain().focus().insertContent({ type: 'token', attrs: { name: 'QR' } }).run()
+              }}
+              style={{
+                padding: '1px 8px', fontSize: 11, borderRadius: 9999,
+                border: `1px solid ${confirmedInviteEnabled ? 'rgba(61,26,46,0.35)' : 'rgba(61,26,46,0.15)'}`,
+                backgroundColor: confirmedInviteEnabled ? 'rgba(61,26,46,0.05)' : 'rgba(0,0,0,0.02)',
+                color: confirmedInviteEnabled ? '#3D1A2E' : 'rgba(61,26,46,0.3)',
+                fontWeight: 600, cursor: confirmedInviteEnabled ? 'pointer' : 'not-allowed',
+              }}
+              onMouseEnter={e => { if (confirmedInviteEnabled) e.currentTarget.style.backgroundColor = 'rgba(61,26,46,0.1)' }}
+              onMouseLeave={e => { e.currentTarget.style.backgroundColor = confirmedInviteEnabled ? 'rgba(61,26,46,0.05)' : 'rgba(0,0,0,0.02)' }}
+            >
+              📷 QR{!confirmedInviteEnabled && ' 🔒'}
+            </button>
+          </div>
         </div>
       )}
 
