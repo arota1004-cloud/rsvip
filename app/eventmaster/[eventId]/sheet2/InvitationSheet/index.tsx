@@ -23,6 +23,9 @@ type Props = {
   onSaveStatusChange: (s: SaveStatus) => void
   onAlert: (msg: string, type?: 'warn' | 'error' | 'info') => void
   confirmedInviteEnabled?: boolean  // QR 토큰 활성화 여부 (Sheet3 설정 연동)
+  rsvpEnabled?: boolean             // RSVP 탭 표시 여부
+  invitationEnabled?: boolean       // 초대장 발송 활성화 여부 (미래 확장)
+  onSendComplete?: () => void       // 발송 완료 후 Sheet1 새로고침 트리거
 }
 
 // ─── 필터 평가 ────────────────────────────────────────────────────────────────
@@ -127,12 +130,12 @@ function ThumbnailZone({ src, onChange }: { src: string; onChange: (src: string)
 // ─── 메인 컴포넌트 ────────────────────────────────────────────────────────────
 const APP_URL = typeof window !== 'undefined' ? window.location.origin : ''
 
-export default function InvitationSheet({ eventId, onSaveStatusChange, onAlert, confirmedInviteEnabled = false }: Props) {
+export default function InvitationSheet({ eventId, onSaveStatusChange, onAlert, confirmedInviteEnabled = false, rsvpEnabled = true, onSendComplete }: Props) {
   const [invitations, setInvitations] = useState<Invitation[]>([])
   const [history, setHistory]         = useState<SendRecord[]>([])
   const [columns, setColumns]         = useState<Column[]>([])
   const [rows, setRows]               = useState<GuestRow[]>([])
-  const [rsvpEnabled, setRsvpEnabled] = useState(true)
+  const [rsvpActive, setRsvpActive] = useState(true)   // DB에서 로드되는 RSVP 활성 설정값
   const [customQuestions, setCustomQuestions] = useState<CustomQuestion[]>([])
   const [activeId, setActiveId]       = useState('')
   const [loading, setLoading]         = useState(true)
@@ -152,7 +155,7 @@ export default function InvitationSheet({ eventId, onSaveStatusChange, onAlert, 
     Promise.all([loadSheet2(eventId), loadSheet(eventId)]).then(([s2, s1]) => {
       setInvitations(s2.invitations)
       setHistory(s2.history)
-      setRsvpEnabled(s2.rsvpEnabled)
+      setRsvpActive(s2.rsvpEnabled)
       setCustomQuestions(s2.customQuestions)
       setColumns(s2.columns as Column[])
       setActiveId(s2.invitations[0]?.id ?? '')
@@ -284,6 +287,7 @@ export default function InvitationSheet({ eventId, onSaveStatusChange, onAlert, 
         }
         setHistory(prev => [record, ...prev])
         onAlert(`${filteredRows.length}명에게 발송 완료 — ${sentAt}`, 'info')
+        onSendComplete?.()   // Sheet1 새로고침 트리거
       } catch {
         onAlert('발송 중 오류가 발생했습니다.', 'error')
       }
@@ -311,27 +315,27 @@ export default function InvitationSheet({ eventId, onSaveStatusChange, onAlert, 
     const next = [...customQuestions]
     const temp = next[idx]; next[idx] = next[target]; next[target] = temp
     setCustomQuestions(next)
-    handleSaveRsvp(rsvpEnabled, next)
-  }, [customQuestions, rsvpEnabled, handleSaveRsvp])
+    handleSaveRsvp(rsvpActive, next)
+  }, [customQuestions, rsvpActive, handleSaveRsvp])
 
   const updateQuestion = useCallback((id: string, patch: Partial<CustomQuestion>) => {
     const next = customQuestions.map(q => q.id === id ? { ...q, ...patch } : q)
     setCustomQuestions(next)
-    handleSaveRsvp(rsvpEnabled, next)
-  }, [customQuestions, rsvpEnabled, handleSaveRsvp])
+    handleSaveRsvp(rsvpActive, next)
+  }, [customQuestions, rsvpActive, handleSaveRsvp])
 
   const removeQuestion = useCallback((id: string) => {
     const next = customQuestions.filter(q => q.id !== id)
     setCustomQuestions(next)
-    handleSaveRsvp(rsvpEnabled, next)
-  }, [customQuestions, rsvpEnabled, handleSaveRsvp])
+    handleSaveRsvp(rsvpActive, next)
+  }, [customQuestions, rsvpActive, handleSaveRsvp])
 
   const addQuestion = useCallback(() => {
     const q: CustomQuestion = { id: crypto.randomUUID(), text: '', type: 'short', required: false }
     const next = [...customQuestions, q]
     setCustomQuestions(next)
-    handleSaveRsvp(rsvpEnabled, next)
-  }, [customQuestions, rsvpEnabled, handleSaveRsvp])
+    handleSaveRsvp(rsvpActive, next)
+  }, [customQuestions, rsvpActive, handleSaveRsvp])
 
   if (loading) {
     return <div className="flex items-center justify-center h-full text-sm" style={{ color: '#8B6A5A' }}>불러오는 중...</div>
@@ -370,10 +374,10 @@ export default function InvitationSheet({ eventId, onSaveStatusChange, onAlert, 
           borderBottom: '1px solid rgba(61,26,46,0.1)', backgroundColor: '#fff', flexShrink: 0,
         }}>
           {([
-            { key: 'editor',  label: '✏️ 에디터' },
-            { key: 'rsvp',    label: '⚙ RSVP 설정' },
-            { key: 'history', label: '📋 발송 이력' },
-          ] as const).map(tab => (
+            { key: 'editor',  label: '✏️ 에디터',    show: true },
+            { key: 'rsvp',    label: '⚙ RSVP 설정', show: rsvpEnabled },
+            { key: 'history', label: '📋 발송 이력', show: true },
+          ] as const).filter(t => t.show).map(tab => (
             <button key={tab.key} onClick={() => setRightTab(tab.key)}
               style={{
                 padding: '0 14px', fontSize: 12, fontWeight: rightTab === tab.key ? 700 : 400,
@@ -626,12 +630,12 @@ export default function InvitationSheet({ eventId, onSaveStatusChange, onAlert, 
                   <p style={{ fontSize: 13, fontWeight: 600, color: '#3D1A2E', margin: 0 }}>RSVP 응답 수집</p>
                   <p style={{ fontSize: 11, color: '#8B6A5A', margin: '2px 0 0' }}>게스트가 링크로 참석 여부를 응답합니다.</p>
                 </div>
-                <ToggleSwitch checked={rsvpEnabled} onChange={() => {
-                  const next = !rsvpEnabled; setRsvpEnabled(next); handleSaveRsvp(next, customQuestions)
+                <ToggleSwitch checked={rsvpActive} onChange={() => {
+                  const next = !rsvpActive; setRsvpActive(next); handleSaveRsvp(next, customQuestions)
                 }} />
               </div>
 
-              {rsvpEnabled && (
+              {rsvpActive && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
                   {/* 기본 문항 (고정) */}

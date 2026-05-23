@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import type { StaffMember } from './actions'
+import type { StaffMember } from './types'
 import { inviteStaff, updateStaffRole, removeStaff } from './actions'
 
 type Props = {

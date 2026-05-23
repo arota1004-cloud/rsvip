@@ -7,11 +7,12 @@ import type { Column, GuestRow } from './actions'
 
 type Props = {
   eventId: string
+  readOnly?: boolean
   onSaveStatusChange?: (status: 'saved' | 'saving' | 'error', savedAt?: string) => void
   onAlert?: (msg: string, type?: 'warn' | 'error' | 'info') => void
 }
 
-export default function Sheet1({ eventId, onSaveStatusChange, onAlert }: Props) {
+export default function Sheet1({ eventId, readOnly = false, onSaveStatusChange, onAlert }: Props) {
   const [data, setData] = useState<{ columns: Column[]; rows: GuestRow[] } | null>(null)
 
   useEffect(() => {
@@ -31,6 +32,7 @@ export default function Sheet1({ eventId, onSaveStatusChange, onAlert }: Props) 
       eventId={eventId}
       initialColumns={data.columns}
       initialRows={data.rows}
+      readOnly={readOnly}
       onSaveStatusChange={onSaveStatusChange ?? (() => {})}
       onAlert={onAlert ?? (() => {})}
     />

@@ -2,29 +2,13 @@
 
 import { cookies } from 'next/headers'
 import { createInsForgeServerClient } from '@/lib/insforge-server'
+import type { EventSettings, StaffMember } from './types'
+import { DEFAULT_SETTINGS } from './types'
 
 async function getInsForge() {
   const accessToken = (await cookies()).get('insforge_access_token')?.value
   if (!accessToken) throw new Error('인증이 필요합니다.')
   return createInsForgeServerClient(accessToken)
-}
-
-export type EventSettings = {
-  invitationEnabled: boolean
-  rsvpEnabled: boolean
-  confirmedInviteEnabled: boolean
-  qrCheckinEnabled: boolean
-  postEventEnabled: boolean
-}
-
-export type StaffMember = {
-  id: string
-  event_id: string
-  user_id: string | null
-  email: string
-  role: 'editor' | 'viewer'
-  invited_at: string
-  accepted_at: string | null
 }
 
 export async function loadSheet3(eventId: string) {
@@ -42,17 +26,9 @@ export async function loadSheet3(eventId: string) {
     .eq('event_id', eventId)
     .order('invited_at', { ascending: true })
 
-  const defaultSettings: EventSettings = {
-    invitationEnabled: false,
-    rsvpEnabled: false,
-    confirmedInviteEnabled: false,
-    qrCheckinEnabled: false,
-    postEventEnabled: false,
-  }
-
-  const settings = eventData && eventData.length > 0
-    ? { ...defaultSettings, ...(eventData[0] as { settings: Partial<EventSettings> }).settings }
-    : defaultSettings
+  const settings: EventSettings = eventData && eventData.length > 0
+    ? { ...DEFAULT_SETTINGS, ...(eventData[0] as { settings: Partial<EventSettings> }).settings }
+    : { ...DEFAULT_SETTINGS }
 
   return {
     settings,

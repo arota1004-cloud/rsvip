@@ -120,7 +120,10 @@ export default function TopDock({ eventId, initialName, initialMemo, alerts, onD
               className="flex items-center justify-between gap-2 px-3 py-1.5 rounded-lg text-xs"
               style={{ backgroundColor: alertBg(alert.type), color: alertColor(alert.type) }}
             >
-              <span>{alert.message}</span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                <span style={{ fontWeight: 700 }}>{alertIcon(alert.type)}</span>
+                {alert.message}
+              </span>
               <button
                 onClick={() => onDismissAlert(alert.id)}
                 className="opacity-60 hover:opacity-100 transition-opacity shrink-0 text-base leading-none"
@@ -145,21 +148,26 @@ function saveStatusColor(s: SaveStatus) {
 }
 function sheetSaveLabel({ status, savedAt }: { status: SaveStatus; savedAt?: string }) {
   if (status === 'saving') return '저장 중...'
-  if (status === 'error') return '저장 실패'
-  return savedAt ? `저장됨 ${savedAt}` : '저장됨'
+  if (status === 'error')  return '저장 실패'
+  return savedAt ? `저장됨 · ${savedAt}` : '저장됨'
 }
 function sheetSaveColor(s: SaveStatus) {
   if (s === 'saving') return '#8B6A5A'
-  if (s === 'error') return '#D94F35'
-  return 'rgba(61,26,46,0.3)'
+  if (s === 'error')  return '#D94F35'
+  return 'rgba(61,26,46,0.28)'
 }
 function alertBg(type: Alert['type']) {
   if (type === 'error') return 'rgba(217,79,53,0.08)'
-  if (type === 'warn') return 'rgba(217,150,53,0.1)'
-  return 'rgba(61,26,46,0.05)'
+  if (type === 'warn')  return 'rgba(200,130,0,0.1)'
+  return 'rgba(39,174,96,0.09)'   // info → 초록
 }
 function alertColor(type: Alert['type']) {
   if (type === 'error') return '#D94F35'
-  if (type === 'warn') return '#A05E10'
-  return '#3D1A2E'
+  if (type === 'warn')  return '#A05E10'
+  return '#1A7A46'                 // info → 초록
+}
+function alertIcon(type: Alert['type']) {
+  if (type === 'error') return '✕'
+  if (type === 'warn')  return '⚠'
+  return '✓'
 }

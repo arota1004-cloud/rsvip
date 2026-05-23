@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import type { EventSettings, StaffMember } from './actions'
+import type { EventSettings, StaffMember } from './types'
+import { DEFAULT_SETTINGS } from './types'
 import { loadSheet3, updateSettings } from './actions'
 import SettingsFlow from './SettingsFlow'
 import StaffManager from './StaffManager'
@@ -9,16 +10,11 @@ import StaffManager from './StaffManager'
 type Props = {
   eventId: string
   onAlert: (msg: string, type?: 'warn' | 'error' | 'info') => void
+  onSettingsChange?: (settings: EventSettings) => void
 }
 
-export default function Sheet3({ eventId, onAlert }: Props) {
-  const [settings, setSettings] = useState<EventSettings>({
-    invitationEnabled: false,
-    rsvpEnabled: false,
-    confirmedInviteEnabled: false,
-    qrCheckinEnabled: false,
-    postEventEnabled: false,
-  })
+export default function Sheet3({ eventId, onAlert, onSettingsChange }: Props) {
+  const [settings, setSettings] = useState<EventSettings>({ ...DEFAULT_SETTINGS })
   const [staff, setStaff] = useState<StaffMember[]>([])
   const [loading, setLoading] = useState(true)
   const [activeSection, setActiveSection] = useState<'flow' | 'staff'>('flow')
@@ -34,6 +30,7 @@ export default function Sheet3({ eventId, onAlert }: Props) {
 
   const handleSettingsChange = useCallback((next: EventSettings) => {
     setSettings(next)
+    onSettingsChange?.(next)   // 부모(EventMasterClient)로 즉시 전파 → Sheet2 연동
     if (saveTimer) clearTimeout(saveTimer)
     const t = setTimeout(async () => {
       try {
@@ -43,7 +40,7 @@ export default function Sheet3({ eventId, onAlert }: Props) {
       }
     }, 600)
     setSaveTimer(t)
-  }, [eventId, saveTimer, onAlert])
+  }, [eventId, saveTimer, onAlert, onSettingsChange])
 
   if (loading) {
     return (

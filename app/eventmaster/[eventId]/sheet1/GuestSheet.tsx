@@ -25,6 +25,7 @@ type Props = {
   eventId: string
   initialColumns: Column[]
   initialRows: GuestRow[]
+  readOnly?: boolean
   onSaveStatusChange: (s: SaveStatus, savedAt?: string) => void
   onAlert: (msg: string, type?: 'warn' | 'error' | 'info') => void
 }
@@ -138,7 +139,7 @@ function nowStr() {
 }
 
 // ─── 컴포넌트 ─────────────────────────────────────────────────────────────────
-export default function GuestSheet({ eventId, initialColumns, initialRows, onSaveStatusChange, onAlert }: Props) {
+export default function GuestSheet({ eventId, initialColumns, initialRows, readOnly = false, onSaveStatusChange, onAlert }: Props) {
   const [columns, setColumns] = useState<Column[]>(initialColumns)
   const [colPanelIdx, setColPanelIdx] = useState<number | null>(null)
   const [showUpload, setShowUpload] = useState(false)
@@ -273,25 +274,6 @@ export default function GuestSheet({ eventId, initialColumns, initialRows, onSav
     scheduleSave()
   }, [onAlert, scheduleSave])
 
-  // ─ 인비테이션 발송열 업데이트 (Sheet2 발송 연동 시 호출) ────────────────────────
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const updateInvitationCell = useCallback((rowIdx: number, text: string) => {
-    const cols = columnsRef.current
-    let invColIdx = cols.findIndex(c => c.id === '__inv__')
-    if (invColIdx < 0) {
-      // 열 추가
-      workbookRef.current?.insertRowOrColumn?.('column', cols.length, 1, 'rightbottom', { id: 'guest_sheet' })
-      workbookRef.current?.setCellValue?.(0, cols.length, '인비테이션 발송', { id: 'guest_sheet' })
-      workbookRef.current?.setCellFormat?.(0, cols.length, 'bg', HEADER_BG, { id: 'guest_sheet' })
-      workbookRef.current?.setCellFormat?.(0, cols.length, 'bl', 1, { id: 'guest_sheet' })
-      invColIdx = cols.length
-      const newCol: Column = { id: '__inv__', name: '인비테이션 발송', width: 200, type: 'text' }
-      setColumns(prev => { const next = [...prev, newCol]; columnsRef.current = next; return next })
-    }
-    workbookRef.current?.setCellValue?.(rowIdx + 1, invColIdx, text, { id: 'guest_sheet' })
-    scheduleSave()
-  }, [scheduleSave])
-
   return (
     <div style={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column' }}>
       {/* 툴바 */}
@@ -299,9 +281,21 @@ export default function GuestSheet({ eventId, initialColumns, initialRows, onSav
         height: 38, display: 'flex', alignItems: 'center', padding: '0 12px', gap: 4,
         borderBottom: '1px solid rgba(61,26,46,0.1)', backgroundColor: '#fff', flexShrink: 0,
       }}>
-        <ToolBtn label="📂 파일 가져오기" onClick={() => setShowUpload(true)} />
-        <div style={{ flex: 1 }} />
-        <ToolBtn label="⚙ 컬럼 관리" onClick={() => setColPanelIdx(selectedColRef.current)} />
+        {readOnly ? (
+          <span style={{
+            fontSize: 11, color: '#8B6A5A', padding: '3px 10px',
+            borderRadius: 6, backgroundColor: 'rgba(61,26,46,0.06)',
+            border: '1px solid rgba(61,26,46,0.12)',
+          }}>
+            🔒 읽기 전용 — 편집 권한이 없습니다
+          </span>
+        ) : (
+          <>
+            <ToolBtn label="📂 파일 가져오기" onClick={() => setShowUpload(true)} />
+            <div style={{ flex: 1 }} />
+            <ToolBtn label="⚙ 컬럼 관리" onClick={() => setColPanelIdx(selectedColRef.current)} />
+          </>
+        )}
       </div>
 
       {/* FortuneSheet 워크북 */}
@@ -309,18 +303,18 @@ export default function GuestSheet({ eventId, initialColumns, initialRows, onSav
         <Workbook
           ref={workbookRef}
           data={sheetData}
-          onChange={handleChange}
+          onChange={readOnly ? undefined : handleChange}
           lang="en"
           showToolbar={false}
           showFormulaBar={false}
           showSheetTabs={false}
-          allowEdit
+          allowEdit={!readOnly}
           // 중국어 컨텍스트 메뉴 완전 제거 — 우리 툴바로 대체
-          cellContextMenu={CELL_CONTEXT_MENU}
+          cellContextMenu={readOnly ? [] : CELL_CONTEXT_MENU}
           headerContextMenu={[]}
           sheetTabContextMenu={[]}
           filterContextMenu={[]}
-          hooks={{
+          hooks={readOnly ? {} : {
             afterSelectionChange: (_sheetId: string, selection: any) => {
               selectedColRef.current = selection?.column?.[0] ?? 0
             },
