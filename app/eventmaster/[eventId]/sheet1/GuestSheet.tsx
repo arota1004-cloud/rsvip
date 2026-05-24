@@ -372,11 +372,12 @@ export default function GuestSheet({ eventId, initialColumns, initialRows, readO
         )}
       </div>
 
-      {/* FortuneSheet 워크북 */}
+      {/* FortuneSheet 워크북 — key 변경 시 재마운트 (dataVerification 갱신) */}
       <div style={{ flex: 1, minHeight: 0 }}>
         <Workbook
+          key={remountKey}
           ref={workbookRef}
-          data={sheetData}
+          data={activeSheetData}
           onChange={readOnly ? undefined : handleChange}
           lang="en"
           showToolbar={false}
@@ -416,6 +417,7 @@ export default function GuestSheet({ eventId, initialColumns, initialRows, readO
         onUpdate={patch => handleColUpdate(activeDockCol, patch)}
         onDelete={() => handleColDelete(activeDockCol)}
         onClose={() => { setDockOpen(false); dockOpenRef.current = false }}
+        onSaveOptions={handleSaveOptions}
       />
 
       {/* 파일 업로드 모달 */}

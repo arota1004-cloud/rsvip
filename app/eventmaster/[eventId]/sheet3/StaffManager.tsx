@@ -198,15 +198,40 @@ export default function StaffManager({ eventId, staff: initialStaff, onAlert }: 
                 <option value="editor">편집자</option>
               </select>
 
-              {/* 수락 상태 배지 */}
-              <span style={{
-                fontSize: 11, padding: '2px 8px', borderRadius: 9999, flexShrink: 0,
-                backgroundColor: member.accepted_at ? 'rgba(34,197,94,0.1)' : 'rgba(234,179,8,0.1)',
-                color: member.accepted_at ? '#16A34A' : '#A16207',
-                fontWeight: 600,
-              }}>
-                {member.accepted_at ? '수락됨' : '대기 중'}
-              </span>
+              {/* 수락 상태 배지 + 미수락 시 초대 링크 복사 */}
+              {member.accepted_at ? (
+                <span style={{
+                  fontSize: 11, padding: '2px 8px', borderRadius: 9999, flexShrink: 0,
+                  backgroundColor: 'rgba(34,197,94,0.1)', color: '#16A34A', fontWeight: 600,
+                }}>
+                  수락됨
+                </span>
+              ) : (
+                <button
+                  title="초대 링크 복사"
+                  onClick={() => {
+                    const url = `${window.location.origin}/staff-invite/${member.id}`
+                    navigator.clipboard.writeText(url).then(() => {
+                      onAlert(`초대 링크가 복사되었습니다. ${member.email}에 전달해 주세요.`, 'info')
+                    })
+                  }}
+                  style={{
+                    fontSize: 11, padding: '2px 10px', borderRadius: 9999, flexShrink: 0,
+                    backgroundColor: 'rgba(234,179,8,0.1)', color: '#A16207', fontWeight: 600,
+                    border: '1px solid rgba(234,179,8,0.25)', cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', gap: 4,
+                    transition: 'all 0.12s',
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.backgroundColor = 'rgba(234,179,8,0.2)'
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.backgroundColor = 'rgba(234,179,8,0.1)'
+                  }}
+                >
+                  🔗 링크 복사
+                </button>
+              )}
 
               {/* 삭제 */}
               <button

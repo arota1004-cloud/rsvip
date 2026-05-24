@@ -13,8 +13,7 @@ type Question = {
 
 type Props = {
   token: string
-  guestId: string
-  eventId: string
+  // guestId / eventId 는 클라이언트에서 보유하지 않음 — 서버 액션이 token으로 직접 도출
   eventName: string
   venue?: string
   dates: string[]
@@ -30,7 +29,7 @@ const STATUS_OPTS = [
 ] as const
 
 export default function RsvpClient({
-  token, guestId, eventId, eventName, venue, dates,
+  token, eventName, venue, dates,
   guestData, customQuestions, existingStatus, existingAnswers,
 }: Props) {
   const [status, setStatus] = useState<'Y' | 'N' | 'U'>(existingStatus)
@@ -43,7 +42,7 @@ export default function RsvpClient({
   const handleSubmit = () => {
     if (status === 'U') return
     startTransition(async () => {
-      await submitRsvp({ token, guestId, eventId, status, answers })
+      await submitRsvp({ token, status, answers })
       setDone(true)
     })
   }

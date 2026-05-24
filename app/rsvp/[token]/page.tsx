@@ -73,8 +73,6 @@ export default async function RsvpPage({ params }: { params: Promise<{ token: st
   return (
     <RsvpClient
       token={token}
-      guestId={guest_id}
-      eventId={event_id}
       eventName={event?.name ?? '이벤트'}
       venue={event?.venue ?? undefined}
       dates={event?.dates ?? []}
