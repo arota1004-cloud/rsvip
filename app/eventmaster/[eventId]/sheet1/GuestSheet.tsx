@@ -447,11 +447,11 @@ function ToolBtn({
         style={{
           padding: '4px 12px', borderRadius: 6, fontSize: 12, fontWeight: 600,
           border: 'none', cursor: 'pointer',
-          backgroundColor: '#D94F35', color: '#fff',
+          backgroundColor: '#FF5C1A', color: '#fff',
           transition: 'background 0.12s',
         }}
         onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#C04030')}
-        onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#D94F35')}
+        onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#FF5C1A')}
       >
         {label}
       </button>
@@ -462,10 +462,10 @@ function ToolBtn({
       onClick={onClick}
       style={{
         padding: '4px 12px', borderRadius: 6, fontSize: 12, fontWeight: 500,
-        border: `1px solid ${active ? '#D94F35' : 'rgba(61,26,46,0.15)'}`,
+        border: `1px solid ${active ? '#FF5C1A' : 'rgba(61,26,46,0.15)'}`,
         cursor: 'pointer',
-        backgroundColor: active ? 'rgba(217,79,53,0.07)' : 'transparent',
-        color: active ? '#D94F35' : '#3D1A2E',
+        backgroundColor: active ? 'rgba(255,92,26,0.07)' : 'transparent',
+        color: active ? '#FF5C1A' : '#3D1A2E',
         transition: 'all 0.12s',
       }}
       onMouseEnter={e => { if (!active) e.currentTarget.style.backgroundColor = 'rgba(61,26,46,0.05)' }}

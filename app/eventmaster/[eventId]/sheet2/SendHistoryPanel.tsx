@@ -92,7 +92,7 @@ export default function SendHistoryPanel({ history, rows = [], columns = [] }: P
                 <tr
                   onClick={() => setExpandedId(isExpanded ? null : rec.id)}
                   style={{ backgroundColor: bg, cursor: 'pointer', transition: 'background 0.1s' }}
-                  onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'rgba(217,79,53,0.04)')}
+                  onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'rgba(255,92,26,0.04)')}
                   onMouseLeave={e => (e.currentTarget.style.backgroundColor = bg)}>
                   {/* 발송일시 */}
                   <td style={TD}>
@@ -104,7 +104,7 @@ export default function SendHistoryPanel({ history, rows = [], columns = [] }: P
                   </td>
                   {/* 대상수 */}
                   <td style={{ ...TD, textAlign: 'center' }}>
-                    <strong style={{ color: '#D94F35' }}>{rec.sent_to_count.toLocaleString()}</strong>
+                    <strong style={{ color: '#FF5C1A' }}>{rec.sent_to_count.toLocaleString()}</strong>
                     <span style={{ fontSize: 11, color: '#8B6A5A' }}>명</span>
                   </td>
                   {/* 채널 배지 */}

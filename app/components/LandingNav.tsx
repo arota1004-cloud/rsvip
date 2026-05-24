@@ -43,7 +43,7 @@ export default function LandingNav(props: Props) {
 
   return (
     <nav className="flex items-center justify-between px-8 py-6">
-      <Link href="/" className="text-xl font-bold tracking-tight" style={{ color: '#D94F35' }}>
+      <Link href="/" className="text-xl font-bold tracking-tight" style={{ color: '#FF5C1A' }}>
         RSViP
       </Link>
 
@@ -51,7 +51,7 @@ export default function LandingNav(props: Props) {
         <Link
           href="/auth"
           className="text-sm font-medium px-5 py-2 rounded-full transition-opacity hover:opacity-80"
-          style={{ backgroundColor: '#D94F35', color: '#F5F0E8' }}
+          style={{ backgroundColor: '#FF5C1A', color: '#F5F0E8' }}
         >
           로그인
         </Link>
@@ -64,8 +64,8 @@ export default function LandingNav(props: Props) {
               display: 'flex', alignItems: 'center', gap: 9,
               padding: '6px 14px 6px 6px',
               borderRadius: 9999,
-              border: `1.5px solid ${open ? '#D94F35' : 'rgba(61,26,46,0.15)'}`,
-              background: open ? 'rgba(217,79,53,0.04)' : '#fff',
+              border: `1.5px solid ${open ? '#FF5C1A' : 'rgba(61,26,46,0.15)'}`,
+              background: open ? 'rgba(255,92,26,0.04)' : '#fff',
               cursor: 'pointer', transition: 'all 0.15s',
             }}
           >
@@ -110,7 +110,7 @@ export default function LandingNav(props: Props) {
                 <Link
                   href="/eventgenerate"
                   onClick={() => setOpen(false)}
-                  style={{ fontSize: 11, fontWeight: 600, color: '#D94F35', textDecoration: 'none' }}
+                  style={{ fontSize: 11, fontWeight: 600, color: '#FF5C1A', textDecoration: 'none' }}
                 >
                   + 새 이벤트
                 </Link>
@@ -127,7 +127,7 @@ export default function LandingNav(props: Props) {
                       style={{
                         display: 'inline-block', fontSize: 12, fontWeight: 600,
                         padding: '7px 16px', borderRadius: 8,
-                        backgroundColor: '#D94F35', color: '#fff', textDecoration: 'none',
+                        backgroundColor: '#FF5C1A', color: '#fff', textDecoration: 'none',
                       }}
                     >
                       첫 이벤트 만들기
@@ -145,13 +145,13 @@ export default function LandingNav(props: Props) {
                         borderBottom: '1px solid rgba(61,26,46,0.05)',
                         transition: 'background 0.1s',
                       }}
-                      onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'rgba(217,79,53,0.04)')}
+                      onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'rgba(255,92,26,0.04)')}
                       onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
                     >
                       {/* 이벤트 아이콘 */}
                       <div style={{
                         width: 34, height: 34, borderRadius: 8, flexShrink: 0,
-                        backgroundColor: 'rgba(217,79,53,0.08)',
+                        backgroundColor: 'rgba(255,92,26,0.08)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         fontSize: 15,
                       }}>
@@ -216,7 +216,7 @@ function Avatar({ name, avatarUrl, size }: { name: string; avatarUrl?: string; s
   return (
     <div style={{
       width: size, height: size, borderRadius: '50%', flexShrink: 0,
-      backgroundColor: '#D94F35',
+      backgroundColor: '#FF5C1A',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       fontSize: size * 0.42, fontWeight: 700, color: '#fff',
       userSelect: 'none',

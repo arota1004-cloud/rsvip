@@ -34,7 +34,7 @@ export default function InvitationEditor({ html, onChange, availableTokens }: Pr
 
   // 변수 토큰 삽입
   const insertToken = (colName: string) => {
-    const token = `<span class="inv-token" style="display:inline-block;padding:1px 7px;border-radius:9999px;background:rgba(217,79,53,0.12);color:#D94F35;font-size:12px;font-weight:600;">{${colName}}</span>`
+    const token = `<span class="inv-token" style="display:inline-block;padding:1px 7px;border-radius:9999px;background:rgba(255,92,26,0.12);color:#FF5C1A;font-size:12px;font-weight:600;">{${colName}}</span>`
     editorRef.current?.focus()
     document.execCommand('insertHTML', false, token)
     setShowTokenMenu(false)
@@ -110,7 +110,7 @@ export default function InvitationEditor({ html, onChange, availableTokens }: Pr
             onMouseDown={e => { e.preventDefault(); setShowTokenMenu(v => !v) }}
             style={{
               padding: '3px 8px', fontSize: 12, borderRadius: 5, cursor: 'pointer',
-              border: '1px solid rgba(217,79,53,0.4)', background: 'none', color: '#D94F35', fontWeight: 600,
+              border: '1px solid rgba(255,92,26,0.4)', background: 'none', color: '#FF5C1A', fontWeight: 600,
             }}
           >
             {'{ }'} 변수
@@ -127,10 +127,10 @@ export default function InvitationEditor({ html, onChange, availableTokens }: Pr
                   key={col}
                   onMouseDown={e => { e.preventDefault(); insertToken(col) }}
                   style={{ display: 'block', width: '100%', textAlign: 'left', padding: '6px 12px', fontSize: 12, background: 'none', border: 'none', cursor: 'pointer', color: '#3D1A2E' }}
-                  onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'rgba(217,79,53,0.06)')}
+                  onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'rgba(255,92,26,0.06)')}
                   onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
                 >
-                  <span style={{ color: '#D94F35', fontWeight: 600 }}>{`{${col}}`}</span>
+                  <span style={{ color: '#FF5C1A', fontWeight: 600 }}>{`{${col}}`}</span>
                 </button>
               ))}
             </div>

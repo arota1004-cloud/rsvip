@@ -24,12 +24,16 @@ export type GuestRow = {
 }
 
 const DEFAULT_COLUMNS: Column[] = [
-  { id: 'col_name',    name: '이름',     width: 120, type: 'text' },
-  { id: 'col_org',     name: '소속',     width: 140, type: 'text' },
-  { id: 'col_phone',   name: '연락처',   width: 130, type: 'text' },
-  { id: 'col_email',   name: '이메일',   width: 180, type: 'text' },
-  { id: 'col_arrival', name: '도착시간', width: 110, type: 'text' },
-  { id: 'col_rsvp',    name: '참석여부', width: 100, type: 'survey' },
+  { id: 'col_handle',   name: '활동명',          width: 130, type: 'text' },
+  { id: 'col_gender',   name: '성별',            width:  90, type: 'dropdown', options: ['남', '여'] },
+  { id: 'col_org',      name: '직업/소속',       width: 150, type: 'text' },
+  { id: 'col_channel',  name: '주력 채널',       width: 110, type: 'dropdown', options: ['IG', 'YT', 'TW', 'FB', 'TK', '기타'] },
+  { id: 'col_link',     name: '채널 링크',       width: 180, type: 'text' },
+  { id: 'col_followers',name: '팔로워수',        width: 100, type: 'text' },
+  { id: 'col_manager',  name: '담당자',          width: 100, type: 'text' },
+  { id: 'col_photo',    name: '포토월 희망',     width: 110, type: 'dropdown', options: ['Y', 'N'] },
+  { id: 'col_time',     name: '참석 시간',       width: 110, type: 'text' },
+  { id: 'col_rsvp',     name: 'RSVP 참석 여부', width: 120, type: 'survey' },
 ]
 
 export async function loadSheet(eventId: string): Promise<{ columns: Column[]; rows: GuestRow[] }> {

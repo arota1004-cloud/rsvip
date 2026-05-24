@@ -15,7 +15,7 @@ function TokenView({ node }: { node: { attrs: { name: string } } }) {
         contentEditable={false}
         style={{
           display: 'inline-block', padding: '1px 8px', borderRadius: 9999,
-          backgroundColor: 'rgba(217,79,53,0.12)', color: '#D94F35',
+          backgroundColor: 'rgba(255,92,26,0.12)', color: '#FF5C1A',
           fontSize: 12, fontWeight: 600, userSelect: 'none', cursor: 'default',
           lineHeight: 1.6,
         }}
@@ -188,12 +188,12 @@ export default function TipTapEditor({ html, onChange, availableTokens, sampleRo
                     }}
                     style={{
                       padding: '1px 8px', fontSize: 11, borderRadius: 9999,
-                      border: '1px solid rgba(217,79,53,0.4)',
-                      backgroundColor: 'rgba(217,79,53,0.06)',
-                      color: '#D94F35', fontWeight: 600, cursor: 'pointer',
+                      border: '1px solid rgba(255,92,26,0.4)',
+                      backgroundColor: 'rgba(255,92,26,0.06)',
+                      color: '#FF5C1A', fontWeight: 600, cursor: 'pointer',
                     }}
-                    onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'rgba(217,79,53,0.14)')}
-                    onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'rgba(217,79,53,0.06)')}
+                    onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'rgba(255,92,26,0.14)')}
+                    onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'rgba(255,92,26,0.06)')}
                   >
                     {name}
                   </button>
@@ -245,7 +245,7 @@ export default function TipTapEditor({ html, onChange, availableTokens, sampleRo
         }
         .tiptap .inv-token {
           display: inline-block; padding: 1px 8px; border-radius: 9999px;
-          background: rgba(217,79,53,0.12); color: #D94F35; font-size: 12px; font-weight: 600;
+          background: rgba(255,92,26,0.12); color: #FF5C1A; font-size: 12px; font-weight: 600;
         }
       `}</style>
     </div>
@@ -263,9 +263,9 @@ function TBtn({ children, onMouseDown, title, active, style }: {
       title={title}
       style={{
         padding: '3px 7px', fontSize: 12, borderRadius: 5, cursor: 'pointer',
-        border: `1px solid ${active ? '#D94F35' : 'rgba(61,26,46,0.15)'}`,
-        backgroundColor: active ? 'rgba(217,79,53,0.08)' : 'transparent',
-        color: active ? '#D94F35' : '#3D1A2E',
+        border: `1px solid ${active ? '#FF5C1A' : 'rgba(61,26,46,0.15)'}`,
+        backgroundColor: active ? 'rgba(255,92,26,0.08)' : 'transparent',
+        color: active ? '#FF5C1A' : '#3D1A2E',
         minWidth: 26, fontWeight: 500,
         ...style,
       }}

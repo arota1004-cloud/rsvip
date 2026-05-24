@@ -45,7 +45,7 @@ export default function BottomTabBar({ activeTab, onChange, tabs = DEFAULT_TABS 
               backgroundColor: active ? '#FFFFFF' : 'transparent',
               color: active ? '#3D1A2E' : '#8B6A5A',
               border: active ? '1px solid rgba(61,26,46,0.12)' : '1px solid transparent',
-              borderBottom: active ? '2px solid #D94F35' : '1px solid transparent',
+              borderBottom: active ? '2px solid #FF5C1A' : '1px solid transparent',
               marginBottom: -1,
               fontWeight: active ? 700 : 500,
               cursor: 'pointer',

@@ -237,7 +237,7 @@ export default function DateCalendar({ onChange }: Props) {
           <div
             key={d}
             className="text-center text-xs font-medium py-1"
-            style={{ color: i === 0 ? '#D94F35' : '#8B6A5A' }}
+            style={{ color: i === 0 ? '#FF5C1A' : '#8B6A5A' }}
           >
             {d}
           </div>
@@ -273,7 +273,7 @@ export default function DateCalendar({ onChange }: Props) {
             : pos === 'middle'
             ? '#3D1A2E'
             : dow === 0
-            ? '#D94F35'
+            ? '#FF5C1A'
             : '#3D1A2E'
 
           return (
@@ -289,7 +289,7 @@ export default function DateCalendar({ onChange }: Props) {
                 {isToday && !pos && (
                   <span
                     className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full"
-                    style={{ backgroundColor: '#D94F35' }}
+                    style={{ backgroundColor: '#FF5C1A' }}
                   />
                 )}
               </div>
@@ -304,8 +304,8 @@ export default function DateCalendar({ onChange }: Props) {
           className="px-5 py-3 text-sm font-medium"
           style={{
             borderTop: '1px solid rgba(61,26,46,0.08)',
-            color: '#D94F35',
-            backgroundColor: 'rgba(217,79,53,0.04)',
+            color: '#FF5C1A',
+            backgroundColor: 'rgba(255,92,26,0.04)',
           }}
         >
           {displayText}

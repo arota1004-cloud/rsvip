@@ -71,7 +71,7 @@ export default function RsvpClient({
           backgroundColor: '#fff', borderRadius: 16, padding: '24px 24px 20px',
           boxShadow: '0 2px 16px rgba(61,26,46,0.08)', marginBottom: 20,
         }}>
-          <p style={{ fontSize: 11, fontWeight: 700, color: '#D94F35', letterSpacing: 1, marginBottom: 6, textTransform: 'uppercase' }}>
+          <p style={{ fontSize: 11, fontWeight: 700, color: '#FF5C1A', letterSpacing: 1, marginBottom: 6, textTransform: 'uppercase' }}>
             초대장
           </p>
           <h1 style={{ fontSize: 22, fontWeight: 800, color: '#3D1A2E', margin: '0 0 12px' }}>
@@ -128,7 +128,7 @@ export default function RsvpClient({
                 <div key={q.id}>
                   <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#3D1A2E', marginBottom: 6 }}>
                     {q.text}
-                    {q.required && <span style={{ color: '#D94F35', marginLeft: 4 }}>*</span>}
+                    {q.required && <span style={{ color: '#FF5C1A', marginLeft: 4 }}>*</span>}
                   </label>
                   {q.type === 'select' && q.options ? (
                     <select
@@ -154,7 +154,7 @@ export default function RsvpClient({
                         border: '1.5px solid rgba(61,26,46,0.15)', outline: 'none', color: '#3D1A2E',
                         boxSizing: 'border-box',
                       }}
-                      onFocus={e => (e.target.style.borderColor = '#D94F35')}
+                      onFocus={e => (e.target.style.borderColor = '#FF5C1A')}
                       onBlur={e => (e.target.style.borderColor = 'rgba(61,26,46,0.15)')}
                     />
                   )}
@@ -171,7 +171,7 @@ export default function RsvpClient({
               width: '100%', padding: '14px', borderRadius: 12, fontSize: 15, fontWeight: 700,
               border: 'none',
               cursor: status === 'U' || isPending ? 'not-allowed' : 'pointer',
-              backgroundColor: status === 'U' ? 'rgba(61,26,46,0.1)' : '#D94F35',
+              backgroundColor: status === 'U' ? 'rgba(61,26,46,0.1)' : '#FF5C1A',
               color: status === 'U' ? '#8B6A5A' : '#fff',
               transition: 'background 0.15s',
             }}

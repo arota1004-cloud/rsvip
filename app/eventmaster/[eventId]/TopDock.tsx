@@ -74,7 +74,7 @@ export default function TopDock({ eventId, initialName, initialMemo, alerts, onD
         <Link
           href="/"
           className="text-sm font-bold tracking-tight"
-          style={{ color: '#D94F35' }}
+          style={{ color: '#FF5C1A' }}
         >
           RSViP
         </Link>
@@ -143,7 +143,7 @@ function saveStatusLabel(s: SaveStatus) {
 }
 function saveStatusColor(s: SaveStatus) {
   if (s === 'saving') return '#8B6A5A'
-  if (s === 'error') return '#D94F35'
+  if (s === 'error') return '#FF5C1A'
   return 'rgba(61,26,46,0.3)'
 }
 function sheetSaveLabel({ status, savedAt }: { status: SaveStatus; savedAt?: string }) {
@@ -153,16 +153,16 @@ function sheetSaveLabel({ status, savedAt }: { status: SaveStatus; savedAt?: str
 }
 function sheetSaveColor(s: SaveStatus) {
   if (s === 'saving') return '#8B6A5A'
-  if (s === 'error')  return '#D94F35'
+  if (s === 'error')  return '#FF5C1A'
   return 'rgba(61,26,46,0.28)'
 }
 function alertBg(type: Alert['type']) {
-  if (type === 'error') return 'rgba(217,79,53,0.08)'
+  if (type === 'error') return 'rgba(255,92,26,0.08)'
   if (type === 'warn')  return 'rgba(200,130,0,0.1)'
   return 'rgba(39,174,96,0.09)'   // info → 초록
 }
 function alertColor(type: Alert['type']) {
-  if (type === 'error') return '#D94F35'
+  if (type === 'error') return '#FF5C1A'
   if (type === 'warn')  return '#A05E10'
   return '#1A7A46'                 // info → 초록
 }

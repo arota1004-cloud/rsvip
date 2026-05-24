@@ -138,7 +138,7 @@ export default function ColumnManagerPanel({
                   border: '1.5px solid rgba(61,26,46,0.15)', outline: 'none', color: '#3D1A2E',
                   boxSizing: 'border-box', backgroundColor: '#faf8f4',
                 }}
-                onFocus={e => (e.target.style.borderColor = '#D94F35')}
+                onFocus={e => (e.target.style.borderColor = '#FF5C1A')}
                 onBlur={e => (e.target.style.borderColor = 'rgba(61,26,46,0.15)')}
               />
             </Section>
@@ -153,8 +153,8 @@ export default function ColumnManagerPanel({
                     style={{
                       display: 'flex', alignItems: 'center', gap: 10, padding: '9px 11px',
                       borderRadius: 8, textAlign: 'left', width: '100%',
-                      border: `1.5px solid ${type === t.value ? '#D94F35' : 'rgba(61,26,46,0.1)'}`,
-                      backgroundColor: type === t.value ? 'rgba(217,79,53,0.04)' : '#faf8f4',
+                      border: `1.5px solid ${type === t.value ? '#FF5C1A' : 'rgba(61,26,46,0.1)'}`,
+                      backgroundColor: type === t.value ? 'rgba(255,92,26,0.04)' : '#faf8f4',
                       cursor: 'pointer', transition: 'all 0.12s',
                     }}
                     onMouseEnter={e => { if (type !== t.value) e.currentTarget.style.borderColor = 'rgba(61,26,46,0.22)' }}
@@ -163,15 +163,15 @@ export default function ColumnManagerPanel({
                     {/* 라디오 원형 */}
                     <div style={{
                       width: 15, height: 15, borderRadius: '50%', flexShrink: 0,
-                      border: `2px solid ${type === t.value ? '#D94F35' : 'rgba(61,26,46,0.22)'}`,
+                      border: `2px solid ${type === t.value ? '#FF5C1A' : 'rgba(61,26,46,0.22)'}`,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                     }}>
                       {type === t.value && (
-                        <div style={{ width: 7, height: 7, borderRadius: '50%', backgroundColor: '#D94F35' }} />
+                        <div style={{ width: 7, height: 7, borderRadius: '50%', backgroundColor: '#FF5C1A' }} />
                       )}
                     </div>
                     <div style={{ flex: 1 }}>
-                      <p style={{ margin: 0, fontSize: 12, fontWeight: 600, color: type === t.value ? '#D94F35' : '#3D1A2E' }}>
+                      <p style={{ margin: 0, fontSize: 12, fontWeight: 600, color: type === t.value ? '#FF5C1A' : '#3D1A2E' }}>
                         {t.icon} {t.label}
                       </p>
                       <p style={{ margin: 0, fontSize: 10, color: '#8B6A5A', marginTop: 1 }}>{t.desc}</p>
@@ -204,7 +204,7 @@ export default function ColumnManagerPanel({
                         <button
                           onClick={() => removeOption(opt)}
                           style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: 'rgba(61,26,46,0.28)', padding: '0 3px', lineHeight: 1 }}
-                          onMouseEnter={e => (e.currentTarget.style.color = '#D94F35')}
+                          onMouseEnter={e => (e.currentTarget.style.color = '#FF5C1A')}
                           onMouseLeave={e => (e.currentTarget.style.color = 'rgba(61,26,46,0.28)')}
                         >✕</button>
                       </div>
@@ -237,7 +237,7 @@ export default function ColumnManagerPanel({
                         cursor: optInput.trim() && !options.includes(optInput.trim()) ? 'pointer' : 'default',
                         backgroundColor: 'transparent',
                         color: optInput.trim() && !options.includes(optInput.trim())
-                          ? '#D94F35' : 'rgba(61,26,46,0.22)',
+                          ? '#FF5C1A' : 'rgba(61,26,46,0.22)',
                         flexShrink: 0,
                       }}
                     >+ 추가</button>
@@ -251,12 +251,12 @@ export default function ColumnManagerPanel({
                     style={{
                       marginTop: 8, width: '100%', padding: '8px', borderRadius: 7,
                       fontSize: 12, fontWeight: 700, border: 'none',
-                      backgroundColor: '#D94F35', color: '#fff',
+                      backgroundColor: '#FF5C1A', color: '#fff',
                       cursor: 'pointer', transition: 'background 0.12s',
                       display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
                     }}
                     onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#C04030')}
-                    onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#D94F35')}
+                    onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#FF5C1A')}
                   >
                     ✓ 선택지 적용
                   </button>
@@ -286,10 +286,10 @@ export default function ColumnManagerPanel({
               }}
               style={{
                 width: '100%', padding: '8px', borderRadius: 7, fontSize: 12, fontWeight: 600,
-                border: '1px solid rgba(217,79,53,0.25)', background: 'none',
-                cursor: 'pointer', color: '#D94F35', transition: 'background 0.12s',
+                border: '1px solid rgba(255,92,26,0.25)', background: 'none',
+                cursor: 'pointer', color: '#FF5C1A', transition: 'background 0.12s',
               }}
-              onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'rgba(217,79,53,0.06)')}
+              onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'rgba(255,92,26,0.06)')}
               onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
             >
               이 컬럼 삭제

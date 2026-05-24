@@ -61,7 +61,7 @@ export default async function EventMasterIndexPage() {
         <Link
           href="/"
           className="text-sm font-bold tracking-tight"
-          style={{ color: '#D94F35' }}
+          style={{ color: '#FF5C1A' }}
         >
           RSViP
         </Link>
@@ -70,7 +70,7 @@ export default async function EventMasterIndexPage() {
           <Link
             href="/eventgenerate"
             className="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold transition-opacity hover:opacity-85"
-            style={{ backgroundColor: '#D94F35', color: '#fff' }}
+            style={{ backgroundColor: '#FF5C1A', color: '#fff' }}
           >
             + 새 이벤트
           </Link>
@@ -99,7 +99,7 @@ export default async function EventMasterIndexPage() {
           >
             <div
               className="w-14 h-14 rounded-full flex items-center justify-center mb-5"
-              style={{ backgroundColor: 'rgba(217,79,53,0.08)' }}
+              style={{ backgroundColor: 'rgba(255,92,26,0.08)' }}
             >
               <span className="text-2xl">🎪</span>
             </div>
@@ -110,7 +110,7 @@ export default async function EventMasterIndexPage() {
             <Link
               href="/eventgenerate"
               className="px-7 py-2.5 rounded-full text-sm font-semibold transition-opacity hover:opacity-85"
-              style={{ backgroundColor: '#D94F35', color: '#fff' }}
+              style={{ backgroundColor: '#FF5C1A', color: '#fff' }}
             >
               이벤트 만들기
             </Link>
@@ -152,7 +152,7 @@ function EventCard({ event }: { event: Event }) {
       {/* 아이콘 */}
       <div
         className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-        style={{ backgroundColor: 'rgba(217,79,53,0.08)' }}
+        style={{ backgroundColor: 'rgba(255,92,26,0.08)' }}
       >
         <span className="text-lg">🎪</span>
       </div>
@@ -181,7 +181,7 @@ function EventCard({ event }: { event: Event }) {
         </span>
         <span
           className="text-base transition-transform group-hover:translate-x-0.5"
-          style={{ color: '#D94F35' }}
+          style={{ color: '#FF5C1A' }}
         >
           →
         </span>

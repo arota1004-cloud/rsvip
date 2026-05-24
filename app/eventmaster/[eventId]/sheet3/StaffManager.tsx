@@ -96,7 +96,7 @@ export default function StaffManager({ eventId, staff: initialStaff, onAlert }: 
               flex: '1 1 200px', padding: '9px 12px', fontSize: 13, borderRadius: 8,
               border: '1.5px solid rgba(61,26,46,0.15)', outline: 'none', color: '#3D1A2E',
             }}
-            onFocus={e => (e.target.style.borderColor = '#D94F35')}
+            onFocus={e => (e.target.style.borderColor = '#FF5C1A')}
             onBlur={e => (e.target.style.borderColor = 'rgba(61,26,46,0.15)')}
           />
           <select
@@ -107,7 +107,7 @@ export default function StaffManager({ eventId, staff: initialStaff, onAlert }: 
               border: '1.5px solid rgba(61,26,46,0.15)', outline: 'none', color: '#3D1A2E',
               backgroundColor: '#fff', cursor: 'pointer',
             }}
-            onFocus={e => (e.target.style.borderColor = '#D94F35')}
+            onFocus={e => (e.target.style.borderColor = '#FF5C1A')}
             onBlur={e => (e.target.style.borderColor = 'rgba(61,26,46,0.15)')}
           >
             <option value="viewer">뷰어</option>
@@ -120,7 +120,7 @@ export default function StaffManager({ eventId, staff: initialStaff, onAlert }: 
               padding: '9px 18px', borderRadius: 8, fontSize: 13, fontWeight: 700,
               border: 'none', flexShrink: 0,
               cursor: isPending || !email.trim() ? 'not-allowed' : 'pointer',
-              backgroundColor: email.trim() ? '#D94F35' : 'rgba(61,26,46,0.1)',
+              backgroundColor: email.trim() ? '#FF5C1A' : 'rgba(61,26,46,0.1)',
               color: email.trim() ? '#fff' : '#8B6A5A',
             }}
           >
@@ -241,7 +241,7 @@ export default function StaffManager({ eventId, staff: initialStaff, onAlert }: 
                   background: 'none', border: 'none', cursor: 'pointer',
                   fontSize: 14, color: 'rgba(61,26,46,0.3)', padding: '4px 6px', flexShrink: 0,
                 }}
-                onMouseEnter={e => (e.currentTarget.style.color = '#D94F35')}
+                onMouseEnter={e => (e.currentTarget.style.color = '#FF5C1A')}
                 onMouseLeave={e => (e.currentTarget.style.color = 'rgba(61,26,46,0.3)')}
               >✕</button>
             </div>

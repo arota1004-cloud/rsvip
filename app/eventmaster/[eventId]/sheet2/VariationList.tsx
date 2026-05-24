@@ -37,7 +37,7 @@ export default function VariationList({ invitations, activeId, onSelect, onRenam
 
         return (
           <div key={inv.id} style={{
-            border: `1px solid ${isActive ? '#D94F35' : 'rgba(61,26,46,0.1)'}`,
+            border: `1px solid ${isActive ? '#FF5C1A' : 'rgba(61,26,46,0.1)'}`,
             borderRadius: 8,
             overflow: 'hidden',
             backgroundColor: '#fff',
@@ -47,7 +47,7 @@ export default function VariationList({ invitations, activeId, onSelect, onRenam
               style={{
                 display: 'flex', alignItems: 'center', gap: 6,
                 padding: '8px 12px', cursor: 'pointer',
-                backgroundColor: isActive ? 'rgba(217,79,53,0.04)' : 'transparent',
+                backgroundColor: isActive ? 'rgba(255,92,26,0.04)' : 'transparent',
               }}
               onClick={() => { onSelect(inv.id); toggle(inv.id) }}
             >
@@ -69,12 +69,12 @@ export default function VariationList({ invitations, activeId, onSelect, onRenam
                     if (e.key === 'Escape') { setEditingId(null); setEditName('') }
                   }}
                   onClick={e => e.stopPropagation()}
-                  style={{ flex: 1, fontSize: 13, fontWeight: 600, padding: '2px 6px', borderRadius: 4, border: '1.5px solid #D94F35', outline: 'none', color: '#3D1A2E' }}
+                  style={{ flex: 1, fontSize: 13, fontWeight: 600, padding: '2px 6px', borderRadius: 4, border: '1.5px solid #FF5C1A', outline: 'none', color: '#3D1A2E' }}
                 />
               ) : (
                 <span
                   onDoubleClick={e => { e.stopPropagation(); setEditingId(inv.id); setEditName(inv.name) }}
-                  style={{ flex: 1, fontSize: 13, fontWeight: isActive ? 700 : 500, color: isActive ? '#D94F35' : '#3D1A2E', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                  style={{ flex: 1, fontSize: 13, fontWeight: isActive ? 700 : 500, color: isActive ? '#FF5C1A' : '#3D1A2E', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
                 >
                   {inv.name}
                 </span>
@@ -116,7 +116,7 @@ export default function VariationList({ invitations, activeId, onSelect, onRenam
           borderRadius: 8, cursor: 'pointer', width: '100%',
           marginTop: 4,
         }}
-        onMouseEnter={e => { e.currentTarget.style.borderColor = '#D94F35'; e.currentTarget.style.color = '#D94F35' }}
+        onMouseEnter={e => { e.currentTarget.style.borderColor = '#FF5C1A'; e.currentTarget.style.color = '#FF5C1A' }}
         onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(61,26,46,0.2)'; e.currentTarget.style.color = '#8B6A5A' }}
       >
         + 배리에이션 추가
@@ -133,10 +133,10 @@ function IconBtn({ title, onClick, danger, children }: { title: string; onClick:
       style={{
         background: 'none', border: 'none', cursor: 'pointer',
         padding: '2px 5px', borderRadius: 4, fontSize: 13, lineHeight: 1,
-        color: danger ? 'rgba(217,79,53,0.4)' : 'rgba(61,26,46,0.35)',
+        color: danger ? 'rgba(255,92,26,0.4)' : 'rgba(61,26,46,0.35)',
       }}
-      onMouseEnter={e => { e.currentTarget.style.color = danger ? '#D94F35' : '#3D1A2E'; e.currentTarget.style.backgroundColor = 'rgba(61,26,46,0.06)' }}
-      onMouseLeave={e => { e.currentTarget.style.color = danger ? 'rgba(217,79,53,0.4)' : 'rgba(61,26,46,0.35)'; e.currentTarget.style.backgroundColor = 'transparent' }}
+      onMouseEnter={e => { e.currentTarget.style.color = danger ? '#FF5C1A' : '#3D1A2E'; e.currentTarget.style.backgroundColor = 'rgba(61,26,46,0.06)' }}
+      onMouseLeave={e => { e.currentTarget.style.color = danger ? 'rgba(255,92,26,0.4)' : 'rgba(61,26,46,0.35)'; e.currentTarget.style.backgroundColor = 'transparent' }}
     >
       {children}
     </button>

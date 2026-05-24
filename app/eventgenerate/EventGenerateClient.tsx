@@ -65,13 +65,13 @@ export default function EventGenerateClient({ isLoggedIn }: { isLoggedIn: boolea
     <main className="min-h-screen pb-32" style={{ backgroundColor: '#F5F0E8', color: '#3D1A2E' }}>
       {/* Nav */}
       <nav className="flex items-center justify-between px-8 py-6">
-        <Link href="/" className="text-xl font-bold tracking-tight" style={{ color: '#D94F35' }}>
+        <Link href="/" className="text-xl font-bold tracking-tight" style={{ color: '#FF5C1A' }}>
           RSViP
         </Link>
         <Link
           href="/auth"
           className="text-sm font-medium px-5 py-2 rounded-full transition-opacity hover:opacity-80"
-          style={{ backgroundColor: '#D94F35', color: '#F5F0E8' }}
+          style={{ backgroundColor: '#FF5C1A', color: '#F5F0E8' }}
         >
           로그인
         </Link>
@@ -111,7 +111,7 @@ export default function EventGenerateClient({ isLoggedIn }: { isLoggedIn: boolea
                   disabled={!eventName.trim()}
                   className="px-5 py-3 rounded-xl text-sm font-semibold transition-opacity"
                   style={{
-                    backgroundColor: eventName.trim() ? '#D94F35' : 'rgba(61,26,46,0.1)',
+                    backgroundColor: eventName.trim() ? '#FF5C1A' : 'rgba(61,26,46,0.1)',
                     color: eventName.trim() ? '#F5F0E8' : '#8B6A5A',
                   }}
                 >
@@ -120,7 +120,7 @@ export default function EventGenerateClient({ isLoggedIn }: { isLoggedIn: boolea
               )}
             </div>
             {step > 1 && (
-              <p className="mt-2 text-sm font-medium" style={{ color: '#D94F35' }}>
+              <p className="mt-2 text-sm font-medium" style={{ color: '#FF5C1A' }}>
                 {eventName}
               </p>
             )}
@@ -217,7 +217,7 @@ export default function EventGenerateClient({ isLoggedIn }: { isLoggedIn: boolea
               onClick={handleSubmit}
               disabled={isPending}
               className="w-full py-4 rounded-2xl font-semibold text-base transition-opacity hover:opacity-85 disabled:opacity-60"
-              style={{ backgroundColor: '#D94F35', color: '#F5F0E8' }}
+              style={{ backgroundColor: '#FF5C1A', color: '#F5F0E8' }}
             >
               {isPending
                 ? (isLoggedIn ? '생성 중...' : '로그인 페이지로 이동 중...')
@@ -252,7 +252,7 @@ function Question({
   return (
     <div>
       <div className="flex items-baseline gap-3 mb-4">
-        <span className="text-xs font-bold tabular-nums" style={{ color: '#D94F35' }}>
+        <span className="text-xs font-bold tabular-nums" style={{ color: '#FF5C1A' }}>
           {String(index).padStart(2, '0')}
         </span>
         <div>

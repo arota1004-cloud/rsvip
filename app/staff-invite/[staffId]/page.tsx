@@ -75,7 +75,7 @@ export default async function StaffInvitePage({
         <a
           href="/dashboard"
           className="inline-block px-6 py-3 rounded-xl text-sm font-bold text-white"
-          style={{ backgroundColor: '#D94F35' }}
+          style={{ backgroundColor: '#FF5C1A' }}
         >
           대시보드로 이동
         </a>

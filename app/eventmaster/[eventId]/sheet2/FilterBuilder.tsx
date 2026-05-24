@@ -126,14 +126,14 @@ export default function FilterBuilder({ rules, columns, rows, onChange, compact 
                 flex: '2 1 100px', minWidth: 72, padding: '4px 8px', fontSize: 12,
                 borderRadius: 6, border: '1px solid rgba(61,26,46,0.2)', outline: 'none', color: '#3D1A2E',
               }}
-              onFocus={e => (e.target.style.borderColor = '#D94F35')}
+              onFocus={e => (e.target.style.borderColor = '#FF5C1A')}
               onBlur={e => (e.target.style.borderColor = 'rgba(61,26,46,0.2)')}
             />
           )}
 
           <button onClick={() => removeRule(rule.id)} title="조건 삭제"
             style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, color: 'rgba(61,26,46,0.35)', padding: '2px 4px', flexShrink: 0 }}
-            onMouseEnter={e => (e.currentTarget.style.color = '#D94F35')}
+            onMouseEnter={e => (e.currentTarget.style.color = '#FF5C1A')}
             onMouseLeave={e => (e.currentTarget.style.color = 'rgba(61,26,46,0.35)')}>✕</button>
         </div>
       ))}
@@ -144,7 +144,7 @@ export default function FilterBuilder({ rules, columns, rows, onChange, compact 
           borderRadius: 6, border: '1px dashed rgba(61,26,46,0.25)',
           background: 'none', color: '#8B6A5A', cursor: 'pointer',
         }}
-        onMouseEnter={e => { e.currentTarget.style.borderColor = '#D94F35'; e.currentTarget.style.color = '#D94F35' }}
+        onMouseEnter={e => { e.currentTarget.style.borderColor = '#FF5C1A'; e.currentTarget.style.color = '#FF5C1A' }}
         onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(61,26,46,0.25)'; e.currentTarget.style.color = '#8B6A5A' }}>
         + 조건 추가
       </button>
@@ -155,7 +155,7 @@ export default function FilterBuilder({ rules, columns, rows, onChange, compact 
           <div className="flex items-center gap-2.5">
             <span style={{ fontSize: 12, color: '#3D1A2E' }}>
               대상자{' '}
-              <strong style={{ color: rules.length > 0 ? '#D94F35' : '#3D1A2E' }}>
+              <strong style={{ color: rules.length > 0 ? '#FF5C1A' : '#3D1A2E' }}>
                 {filteredRows.length}
               </strong>/{rows.length}명
             </span>

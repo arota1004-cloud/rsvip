@@ -64,7 +64,7 @@ function Toggle({ on, disabled, onClick }: { on: boolean; disabled?: boolean; on
       onClick={onClick}
       style={{
         position: 'relative', width: 44, height: 24, borderRadius: 12, flexShrink: 0,
-        backgroundColor: on ? '#D94F35' : 'rgba(61,26,46,0.18)',
+        backgroundColor: on ? '#FF5C1A' : 'rgba(61,26,46,0.18)',
         border: 'none', cursor: disabled ? 'not-allowed' : 'pointer',
         transition: 'background 0.2s',
       }}
@@ -108,11 +108,11 @@ function RadioGroup<T extends string>({
           onClick={() => !opt.disabled && onChange(opt.value)}
           style={{
             padding: '4px 12px', fontSize: 12, borderRadius: 9999,
-            border: `1px solid ${value === opt.value ? '#D94F35' : 'rgba(61,26,46,0.18)'}`,
-            backgroundColor: value === opt.value ? 'rgba(217,79,53,0.08)' : '#fff',
+            border: `1px solid ${value === opt.value ? '#FF5C1A' : 'rgba(61,26,46,0.18)'}`,
+            backgroundColor: value === opt.value ? 'rgba(255,92,26,0.08)' : '#fff',
             color: opt.disabled
               ? 'rgba(61,26,46,0.3)'
-              : value === opt.value ? '#D94F35' : '#3D1A2E',
+              : value === opt.value ? '#FF5C1A' : '#3D1A2E',
             fontWeight: value === opt.value ? 700 : 400,
             cursor: opt.disabled ? 'not-allowed' : 'pointer',
             transition: 'all 0.15s',
@@ -158,7 +158,7 @@ function SmallToggle({ on, onChange }: { on: boolean; onChange: (v: boolean) => 
       onClick={() => onChange(!on)}
       style={{
         position: 'relative', width: 36, height: 20, borderRadius: 10,
-        backgroundColor: on ? '#D94F35' : 'rgba(61,26,46,0.18)',
+        backgroundColor: on ? '#FF5C1A' : 'rgba(61,26,46,0.18)',
         border: 'none', cursor: 'pointer', transition: 'background 0.2s',
       }}
     >
@@ -223,7 +223,7 @@ function Step2Sub({ s, onChange }: { s: EventSettings; onChange: (s: EventSettin
       <SubRow label="미응답자 리마인드">
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <SmallToggle on={s.rsvpReminder} onChange={v => onChange({ ...s, rsvpReminder: v })} />
-          <span style={{ fontSize: 12, color: s.rsvpReminder ? '#D94F35' : '#8B6A5A' }}>
+          <span style={{ fontSize: 12, color: s.rsvpReminder ? '#FF5C1A' : '#8B6A5A' }}>
             {s.rsvpReminder ? 'ON — 마감 48시간 전 자동 리마인드' : 'OFF'}
           </span>
         </div>
@@ -356,12 +356,12 @@ export default function SettingsFlow({ settings, onChange }: Props) {
               borderRadius: 12,
               border: `1px solid ${
                 active
-                  ? 'rgba(217,79,53,0.3)'
+                  ? 'rgba(255,92,26,0.3)'
                   : available
                   ? 'rgba(61,26,46,0.12)'
                   : 'rgba(61,26,46,0.06)'
               }`,
-              backgroundColor: active ? 'rgba(217,79,53,0.02)' : available ? '#fff' : '#faf8f4',
+              backgroundColor: active ? 'rgba(255,92,26,0.02)' : available ? '#fff' : '#faf8f4',
               opacity: available ? 1 : 0.55,
               overflow: 'hidden',
               transition: 'all 0.15s',
@@ -373,7 +373,7 @@ export default function SettingsFlow({ settings, onChange }: Props) {
               <div style={{
                 width: 40, height: 40, borderRadius: '50%', flexShrink: 0,
                 display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20,
-                backgroundColor: active ? 'rgba(217,79,53,0.12)' : 'rgba(61,26,46,0.06)',
+                backgroundColor: active ? 'rgba(255,92,26,0.12)' : 'rgba(61,26,46,0.06)',
               }}>
                 {step.icon}
               </div>
@@ -395,7 +395,7 @@ export default function SettingsFlow({ settings, onChange }: Props) {
                 </div>
                 <p style={{
                   fontSize: 14, fontWeight: 700, margin: '0 0 2px',
-                  color: active ? '#D94F35' : available ? '#3D1A2E' : '#8B6A5A',
+                  color: active ? '#FF5C1A' : available ? '#3D1A2E' : '#8B6A5A',
                 }}>
                   {step.title}
                 </p>
@@ -417,7 +417,7 @@ export default function SettingsFlow({ settings, onChange }: Props) {
               <div style={{
                 padding: '10px 18px 16px 72px',
                 borderTop: '1px solid rgba(61,26,46,0.07)',
-                backgroundColor: 'rgba(217,79,53,0.015)',
+                backgroundColor: 'rgba(255,92,26,0.015)',
                 animation: 'fadeIn 0.15s ease',
               }}>
                 <SubContent s={settings} onChange={onChange} />

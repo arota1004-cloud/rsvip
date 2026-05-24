@@ -288,7 +288,7 @@ export default function SpreadsheetGrid({
               key={row.id}
               style={{
                 display: 'flex',
-                borderTop: dragOverRowIdx === ri && dragRowIdx !== ri ? '2px solid #D94F35' : '2px solid transparent',
+                borderTop: dragOverRowIdx === ri && dragRowIdx !== ri ? '2px solid #FF5C1A' : '2px solid transparent',
               }}
               onDragOver={e => { e.preventDefault(); setDragOverRowIdx(ri) }}
               onDrop={e => {
@@ -310,9 +310,9 @@ export default function SpreadsheetGrid({
                   ...rowNumStyle({ height: ROW_HEIGHT, position: 'sticky', left: 0, zIndex: 10 }),
                   borderBottom: '1px solid rgba(61,26,46,0.08)',
                   cursor: 'grab',
-                  backgroundColor: grid.isInSelection(ri, 0) ? 'rgba(217,79,53,0.06)' : '#F0EBE1',
+                  backgroundColor: grid.isInSelection(ri, 0) ? 'rgba(255,92,26,0.06)' : '#F0EBE1',
                   fontSize: dragRowIdx === ri ? 10 : 11,
-                  color: dragRowIdx === ri ? '#D94F35' : '#8B6A5A',
+                  color: dragRowIdx === ri ? '#FF5C1A' : '#8B6A5A',
                 }}
                 onClick={() => grid.setSelection({ anchor: { row: ri, col: 0 }, focus: { row: ri, col: grid.columns.length - 1 } })}
               >
@@ -369,7 +369,7 @@ export default function SpreadsheetGrid({
           {/* 빈 행 추가 */}
           <div style={{ display: 'flex' }}>
             <div
-              style={{ ...rowNumStyle({ height: ROW_HEIGHT }), borderBottom: '1px solid rgba(61,26,46,0.08)', cursor: 'pointer', color: '#D94F35', fontSize: 16 }}
+              style={{ ...rowNumStyle({ height: ROW_HEIGHT }), borderBottom: '1px solid rgba(61,26,46,0.08)', cursor: 'pointer', color: '#FF5C1A', fontSize: 16 }}
               onClick={grid.addRow}
               title="행 추가"
             >+</div>
@@ -406,7 +406,7 @@ export default function SpreadsheetGrid({
                   padding: '7px 14px', fontSize: 13, background: 'none', border: 'none',
                   cursor: 'pointer', color: '#3D1A2E',
                 }}
-                onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'rgba(217,79,53,0.06)')}
+                onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'rgba(255,92,26,0.06)')}
                 onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
               >
                 {item.label}
@@ -460,16 +460,16 @@ export default function SpreadsheetGrid({
 }
 
 function ToolBtn({ label, onClick, primary = false, danger = false }: { label: string; onClick: () => void; primary?: boolean; danger?: boolean }) {
-  const bg = primary ? '#D94F35' : 'transparent'
-  const color = primary ? '#fff' : danger ? '#D94F35' : '#3D1A2E'
-  const border = primary ? 'none' : danger ? '1px solid rgba(217,79,53,0.3)' : '1px solid rgba(61,26,46,0.15)'
+  const bg = primary ? '#FF5C1A' : 'transparent'
+  const color = primary ? '#fff' : danger ? '#FF5C1A' : '#3D1A2E'
+  const border = primary ? 'none' : danger ? '1px solid rgba(255,92,26,0.3)' : '1px solid rgba(61,26,46,0.15)'
   return (
     <button
       onClick={onClick}
       style={{ padding: '4px 12px', borderRadius: 6, fontSize: 12, fontWeight: 500, border, cursor: 'pointer', backgroundColor: bg, color }}
       onMouseEnter={e => {
         if (primary) return
-        e.currentTarget.style.backgroundColor = danger ? 'rgba(217,79,53,0.06)' : 'rgba(61,26,46,0.05)'
+        e.currentTarget.style.backgroundColor = danger ? 'rgba(255,92,26,0.06)' : 'rgba(61,26,46,0.05)'
       }}
       onMouseLeave={e => { if (!primary) e.currentTarget.style.backgroundColor = 'transparent' }}
     >

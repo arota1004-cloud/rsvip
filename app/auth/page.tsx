@@ -24,7 +24,7 @@ export default function AuthPage() {
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="text-center mb-10">
-          <span className="text-3xl font-bold tracking-tight" style={{ color: '#D94F35' }}>
+          <span className="text-3xl font-bold tracking-tight" style={{ color: '#FF5C1A' }}>
             RSViP
           </span>
           <p className="mt-2 text-sm" style={{ color: '#8B6A5A' }}>

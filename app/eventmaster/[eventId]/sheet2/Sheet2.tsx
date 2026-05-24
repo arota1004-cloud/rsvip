@@ -264,8 +264,8 @@ export default function Sheet2({ eventId, onSaveStatusChange, onAlert }: Props) 
               style={{
                 padding: '0 16px', fontSize: 12, fontWeight: activeTab === tab.key ? 700 : 400,
                 background: 'none', border: 'none', cursor: 'pointer',
-                color: activeTab === tab.key ? '#D94F35' : '#8B6A5A',
-                borderBottom: activeTab === tab.key ? '2px solid #D94F35' : '2px solid transparent',
+                color: activeTab === tab.key ? '#FF5C1A' : '#8B6A5A',
+                borderBottom: activeTab === tab.key ? '2px solid #FF5C1A' : '2px solid transparent',
                 marginBottom: -1,
               }}
             >
@@ -379,7 +379,7 @@ export default function Sheet2({ eventId, onSaveStatusChange, onAlert }: Props) 
                         <button
                           onClick={() => removeQuestion(q.id)}
                           style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: 'rgba(61,26,46,0.35)', padding: '2px 4px' }}
-                          onMouseEnter={e => (e.currentTarget.style.color = '#D94F35')}
+                          onMouseEnter={e => (e.currentTarget.style.color = '#FF5C1A')}
                           onMouseLeave={e => (e.currentTarget.style.color = 'rgba(61,26,46,0.35)')}
                         >✕</button>
                       </div>
@@ -396,7 +396,7 @@ export default function Sheet2({ eventId, onSaveStatusChange, onAlert }: Props) 
                           flex: 1, padding: '6px 10px', fontSize: 12, borderRadius: 8,
                           border: '1px solid rgba(61,26,46,0.15)', outline: 'none', color: '#3D1A2E',
                         }}
-                        onFocus={e => (e.target.style.borderColor = '#D94F35')}
+                        onFocus={e => (e.target.style.borderColor = '#FF5C1A')}
                         onBlur={e => (e.target.style.borderColor = 'rgba(61,26,46,0.15)')}
                       />
                       <button
@@ -405,7 +405,7 @@ export default function Sheet2({ eventId, onSaveStatusChange, onAlert }: Props) 
                         style={{
                           padding: '6px 12px', borderRadius: 8, fontSize: 12, fontWeight: 600,
                           border: 'none', cursor: newQText.trim() ? 'pointer' : 'default',
-                          backgroundColor: newQText.trim() ? '#D94F35' : 'rgba(61,26,46,0.1)',
+                          backgroundColor: newQText.trim() ? '#FF5C1A' : 'rgba(61,26,46,0.1)',
                           color: newQText.trim() ? '#fff' : '#8B6A5A',
                         }}
                       >추가</button>
@@ -451,7 +451,7 @@ export default function Sheet2({ eventId, onSaveStatusChange, onAlert }: Props) 
                   a.download = 'qr-checkin.png'
                   a.click()
                 }}
-                style={{ padding: '8px 18px', borderRadius: 8, fontSize: 12, fontWeight: 600, border: 'none', backgroundColor: '#D94F35', color: '#fff', cursor: 'pointer' }}
+                style={{ padding: '8px 18px', borderRadius: 8, fontSize: 12, fontWeight: 600, border: 'none', backgroundColor: '#FF5C1A', color: '#fff', cursor: 'pointer' }}
               >
                 PNG 저장
               </button>
@@ -481,7 +481,7 @@ function SendBtn({ label, onClick, disabled, primary, title }: {
         padding: '6px 14px', borderRadius: 8, fontSize: 12, fontWeight: 600,
         border: primary ? 'none' : '1px solid rgba(61,26,46,0.2)',
         cursor: disabled ? 'not-allowed' : 'pointer',
-        backgroundColor: disabled ? 'rgba(61,26,46,0.07)' : primary ? '#D94F35' : '#fff',
+        backgroundColor: disabled ? 'rgba(61,26,46,0.07)' : primary ? '#FF5C1A' : '#fff',
         color: disabled ? '#8B6A5A' : primary ? '#fff' : '#3D1A2E',
         opacity: disabled ? 0.6 : 1,
       }}
@@ -499,7 +499,7 @@ function ToggleSwitch({ checked, onChange }: { checked: boolean; onChange: () =>
       onClick={onChange}
       style={{
         position: 'relative', width: 40, height: 22, borderRadius: 11,
-        backgroundColor: checked ? '#D94F35' : 'rgba(61,26,46,0.2)',
+        backgroundColor: checked ? '#FF5C1A' : 'rgba(61,26,46,0.2)',
         border: 'none', cursor: 'pointer', flexShrink: 0,
         transition: 'background 0.2s',
       }}

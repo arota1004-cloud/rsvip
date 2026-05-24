@@ -104,7 +104,7 @@ export default function FileUploadModal({ columns, onImport, onClose }: Props) {
       onClick={action}
       style={{
         padding: '8px 18px', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer',
-        backgroundColor: primary ? '#D94F35' : 'rgba(61,26,46,0.07)',
+        backgroundColor: primary ? '#FF5C1A' : 'rgba(61,26,46,0.07)',
         color: primary ? '#fff' : '#3D1A2E',
         border: 'none',
       }}
@@ -134,10 +134,10 @@ export default function FileUploadModal({ columns, onImport, onClose }: Props) {
                 onDrop={handleDrop}
                 onClick={() => fileRef.current?.click()}
                 style={{
-                  border: `2px dashed ${dragging ? '#D94F35' : 'rgba(61,26,46,0.2)'}`,
+                  border: `2px dashed ${dragging ? '#FF5C1A' : 'rgba(61,26,46,0.2)'}`,
                   borderRadius: 12, padding: '40px 20px',
                   textAlign: 'center', cursor: 'pointer',
-                  backgroundColor: dragging ? 'rgba(217,79,53,0.04)' : '#faf8f4',
+                  backgroundColor: dragging ? 'rgba(255,92,26,0.04)' : '#faf8f4',
                   transition: 'all 0.15s',
                 }}
               >
@@ -148,7 +148,7 @@ export default function FileUploadModal({ columns, onImport, onClose }: Props) {
                 <input ref={fileRef} type="file" accept=".xlsx,.csv" style={{ display: 'none' }} onChange={handleFileChange} />
               </div>
 
-              {error && <p style={{ marginTop: 12, fontSize: 12, color: '#D94F35' }}>{error}</p>}
+              {error && <p style={{ marginTop: 12, fontSize: 12, color: '#FF5C1A' }}>{error}</p>}
 
               <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 16, fontSize: 13, color: '#3D1A2E', cursor: 'pointer' }}>
                 <input type="checkbox" checked={firstRowIsHeader} onChange={e => setFirstRowIsHeader(e.target.checked)} />

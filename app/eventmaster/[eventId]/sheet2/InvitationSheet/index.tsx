@@ -115,9 +115,9 @@ function ThumbnailZone({ src, onChange }: { src: string; onChange: (src: string)
       style={{
         flexShrink: 0, width: '100%', padding: '14px 0',
         display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
-        border: `2px dashed ${dragging ? '#D94F35' : 'rgba(61,26,46,0.18)'}`,
+        border: `2px dashed ${dragging ? '#FF5C1A' : 'rgba(61,26,46,0.18)'}`,
         borderRadius: '10px 10px 0 0', cursor: 'pointer',
-        backgroundColor: dragging ? 'rgba(217,79,53,0.04)' : '#fafaf8', transition: 'all 0.15s',
+        backgroundColor: dragging ? 'rgba(255,92,26,0.04)' : '#fafaf8', transition: 'all 0.15s',
       }}>
       <span style={{ fontSize: 22 }}>🖼</span>
       <span style={{ fontSize: 12, color: '#8B6A5A' }}>썸네일 이미지 드래그 또는 클릭</span>
@@ -382,8 +382,8 @@ export default function InvitationSheet({ eventId, onSaveStatusChange, onAlert, 
               style={{
                 padding: '0 14px', fontSize: 12, fontWeight: rightTab === tab.key ? 700 : 400,
                 background: 'none', border: 'none', cursor: 'pointer',
-                color: rightTab === tab.key ? '#D94F35' : '#8B6A5A',
-                borderBottom: rightTab === tab.key ? '2px solid #D94F35' : '2px solid transparent',
+                color: rightTab === tab.key ? '#FF5C1A' : '#8B6A5A',
+                borderBottom: rightTab === tab.key ? '2px solid #FF5C1A' : '2px solid transparent',
                 marginBottom: -1,
               }}
             >{tab.label}</button>
@@ -428,12 +428,12 @@ export default function InvitationSheet({ eventId, onSaveStatusChange, onAlert, 
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     {/* 필터 뱃지 */}
                     {activeInv.filter_rules.length > 0 && (
-                      <span style={{ fontSize: 10, padding: '1px 6px', borderRadius: 9999, backgroundColor: 'rgba(217,79,53,0.1)', color: '#D94F35' }}>
+                      <span style={{ fontSize: 10, padding: '1px 6px', borderRadius: 9999, backgroundColor: 'rgba(255,92,26,0.1)', color: '#FF5C1A' }}>
                         필터 {activeInv.filter_rules.length}
                       </span>
                     )}
                     {/* 대상수 */}
-                    <span style={{ fontSize: 12, color: filteredRows.length > 0 ? '#D94F35' : '#8B6A5A', fontWeight: 600 }}>
+                    <span style={{ fontSize: 12, color: filteredRows.length > 0 ? '#FF5C1A' : '#8B6A5A', fontWeight: 600 }}>
                       {filteredRows.length}명
                     </span>
                     <span style={{ fontSize: 10, color: '#8B6A5A' }}>{sendPanelOpen ? '▴' : '▾'}</span>
@@ -478,10 +478,10 @@ export default function InvitationSheet({ eventId, onSaveStatusChange, onAlert, 
                               onClick={() => { if (!ch.disabled && ch.key !== 'sms') setChannel(ch.key) }}
                               style={{
                                 padding: '5px 12px', fontSize: 12, fontWeight: isActive ? 700 : 400, borderRadius: 20,
-                                border: `1px solid ${isActive ? '#D94F35' : ch.disabled ? 'rgba(61,26,46,0.1)' : 'rgba(61,26,46,0.2)'}`,
+                                border: `1px solid ${isActive ? '#FF5C1A' : ch.disabled ? 'rgba(61,26,46,0.1)' : 'rgba(61,26,46,0.2)'}`,
                                 cursor: ch.disabled ? 'not-allowed' : 'pointer',
-                                backgroundColor: isActive ? 'rgba(217,79,53,0.08)' : ch.disabled ? 'rgba(0,0,0,0.02)' : '#fff',
-                                color: isActive ? '#D94F35' : ch.disabled ? 'rgba(61,26,46,0.3)' : '#3D1A2E',
+                                backgroundColor: isActive ? 'rgba(255,92,26,0.08)' : ch.disabled ? 'rgba(0,0,0,0.02)' : '#fff',
+                                color: isActive ? '#FF5C1A' : ch.disabled ? 'rgba(61,26,46,0.3)' : '#3D1A2E',
                                 position: 'relative',
                               }}>
                               {ch.label}
@@ -511,7 +511,7 @@ export default function InvitationSheet({ eventId, onSaveStatusChange, onAlert, 
                             border: '1px solid rgba(61,26,46,0.2)', outline: 'none', color: '#3D1A2E',
                             backgroundColor: '#fff', boxSizing: 'border-box',
                           }}
-                          onFocus={e => (e.target.style.borderColor = '#D94F35')}
+                          onFocus={e => (e.target.style.borderColor = '#FF5C1A')}
                           onBlur={e => (e.target.style.borderColor = 'rgba(61,26,46,0.2)')}
                         />
                       </div>
@@ -530,7 +530,7 @@ export default function InvitationSheet({ eventId, onSaveStatusChange, onAlert, 
                               padding: '3px 10px', fontSize: 11, fontWeight: 600, borderRadius: 6,
                               border: '1px solid rgba(61,26,46,0.2)', background: 'none', cursor: 'pointer', color: '#3D1A2E',
                             }}
-                            onMouseEnter={e => { e.currentTarget.style.borderColor = '#D94F35'; e.currentTarget.style.color = '#D94F35' }}
+                            onMouseEnter={e => { e.currentTarget.style.borderColor = '#FF5C1A'; e.currentTarget.style.color = '#FF5C1A' }}
                             onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(61,26,46,0.2)'; e.currentTarget.style.color = '#3D1A2E' }}>
                             📋 전체 복사
                           </button>
@@ -566,7 +566,7 @@ export default function InvitationSheet({ eventId, onSaveStatusChange, onAlert, 
                                     border: '1px solid rgba(61,26,46,0.15)', background: 'none',
                                     cursor: 'pointer', color: '#8B6A5A',
                                   }}
-                                  onMouseEnter={e => { e.currentTarget.style.borderColor = '#D94F35'; e.currentTarget.style.color = '#D94F35' }}
+                                  onMouseEnter={e => { e.currentTarget.style.borderColor = '#FF5C1A'; e.currentTarget.style.color = '#FF5C1A' }}
                                   onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(61,26,46,0.15)'; e.currentTarget.style.color = '#8B6A5A' }}>
                                   복사
                                 </button>
@@ -590,7 +590,7 @@ export default function InvitationSheet({ eventId, onSaveStatusChange, onAlert, 
                         style={{
                           flex: 1, padding: '8px 16px', borderRadius: 8, fontSize: 13, fontWeight: 700,
                           border: 'none', cursor: filteredRows.length === 0 || isSending ? 'not-allowed' : 'pointer',
-                          backgroundColor: filteredRows.length === 0 || isSending ? 'rgba(61,26,46,0.12)' : '#D94F35',
+                          backgroundColor: filteredRows.length === 0 || isSending ? 'rgba(61,26,46,0.12)' : '#FF5C1A',
                           color: filteredRows.length === 0 || isSending ? '#8B6A5A' : '#fff',
                           opacity: filteredRows.length === 0 || isSending ? 0.7 : 1,
                           transition: 'all 0.15s',
@@ -694,7 +694,7 @@ export default function InvitationSheet({ eventId, onSaveStatusChange, onAlert, 
                                 border: '1px solid rgba(61,26,46,0.15)', outline: 'none',
                                 color: '#3D1A2E', backgroundColor: '#fafaf8',
                               }}
-                              onFocus={e => (e.target.style.borderColor = '#D94F35')}
+                              onFocus={e => (e.target.style.borderColor = '#FF5C1A')}
                               onBlur={e => (e.target.style.borderColor = 'rgba(61,26,46,0.15)')}
                             />
 
@@ -715,7 +715,7 @@ export default function InvitationSheet({ eventId, onSaveStatusChange, onAlert, 
                             {/* 삭제 */}
                             <button onClick={() => removeQuestion(q.id)}
                               style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 15, color: 'rgba(61,26,46,0.3)', padding: '2px 4px', flexShrink: 0 }}
-                              onMouseEnter={e => (e.currentTarget.style.color = '#D94F35')}
+                              onMouseEnter={e => (e.currentTarget.style.color = '#FF5C1A')}
                               onMouseLeave={e => (e.currentTarget.style.color = 'rgba(61,26,46,0.3)')}>✕</button>
                           </div>
 
@@ -738,7 +738,7 @@ export default function InvitationSheet({ eventId, onSaveStatusChange, onAlert, 
                           background: 'none', border: '1px dashed rgba(61,26,46,0.2)',
                           borderRadius: 10, cursor: 'pointer', width: '100%', marginTop: 2,
                         }}
-                        onMouseEnter={e => { e.currentTarget.style.borderColor = '#D94F35'; e.currentTarget.style.color = '#D94F35' }}
+                        onMouseEnter={e => { e.currentTarget.style.borderColor = '#FF5C1A'; e.currentTarget.style.color = '#FF5C1A' }}
                         onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(61,26,46,0.2)'; e.currentTarget.style.color = '#8B6A5A' }}>
                         + 문항 추가
                       </button>
@@ -822,8 +822,8 @@ export default function InvitationSheet({ eventId, onSaveStatusChange, onAlert, 
               )}
             </div>
             <div style={{
-              padding: '12px 14px', borderRadius: 8, backgroundColor: 'rgba(217,79,53,0.06)',
-              border: '1px solid rgba(217,79,53,0.15)', marginBottom: 20,
+              padding: '12px 14px', borderRadius: 8, backgroundColor: 'rgba(255,92,26,0.06)',
+              border: '1px solid rgba(255,92,26,0.15)', marginBottom: 20,
             }}>
               <p style={{ margin: 0, fontSize: 12, color: '#8B6A5A', lineHeight: 1.6 }}>
                 발송 후 게스트 시트의 <strong style={{ color: '#3D1A2E' }}>인비테이션 발송</strong> 열이 자동 업데이트됩니다.
@@ -837,7 +837,7 @@ export default function InvitationSheet({ eventId, onSaveStatusChange, onAlert, 
               </button>
               <button
                 onClick={doSend}
-                style={{ padding: '8px 20px', borderRadius: 8, fontSize: 13, fontWeight: 700, border: 'none', backgroundColor: '#D94F35', color: '#fff', cursor: 'pointer' }}>
+                style={{ padding: '8px 20px', borderRadius: 8, fontSize: 13, fontWeight: 700, border: 'none', backgroundColor: '#FF5C1A', color: '#fff', cursor: 'pointer' }}>
                 발송 확인 →
               </button>
             </div>
@@ -858,7 +858,7 @@ export default function InvitationSheet({ eventId, onSaveStatusChange, onAlert, 
             <img src={qrDataUrl} alt="QR" style={{ width: 240, height: 240 }} />
             <div style={{ display: 'flex', gap: 8 }}>
               <button onClick={() => { const a = document.createElement('a'); a.href = qrDataUrl; a.download = 'qr.png'; a.click() }}
-                style={{ padding: '8px 18px', borderRadius: 8, fontSize: 12, fontWeight: 600, border: 'none', backgroundColor: '#D94F35', color: '#fff', cursor: 'pointer' }}>
+                style={{ padding: '8px 18px', borderRadius: 8, fontSize: 12, fontWeight: 600, border: 'none', backgroundColor: '#FF5C1A', color: '#fff', cursor: 'pointer' }}>
                 PNG 저장
               </button>
               <button onClick={() => setShowQrModal(false)}
@@ -923,7 +923,7 @@ function InfoRow({ label, value, highlight }: { label: string; value: string; hi
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 0 }}>
       <span style={{ width: 80, fontSize: 12, color: '#8B6A5A', flexShrink: 0 }}>{label}</span>
-      <span style={{ fontSize: 13, fontWeight: highlight ? 700 : 500, color: highlight ? '#D94F35' : '#3D1A2E' }}>
+      <span style={{ fontSize: 13, fontWeight: highlight ? 700 : 500, color: highlight ? '#FF5C1A' : '#3D1A2E' }}>
         {value}
       </span>
     </div>
@@ -937,7 +937,7 @@ function ToggleSwitch({ checked, onChange, small }: { checked: boolean; onChange
     <button role="switch" aria-checked={checked} onClick={onChange}
       style={{
         position: 'relative', width: w, height: h, borderRadius: r, flexShrink: 0,
-        backgroundColor: checked ? '#D94F35' : 'rgba(61,26,46,0.2)',
+        backgroundColor: checked ? '#FF5C1A' : 'rgba(61,26,46,0.2)',
         border: 'none', cursor: 'pointer', transition: 'background 0.2s',
       }}>
       <span style={{
@@ -962,7 +962,7 @@ function ArrowBtn({ dir, disabled, onClick }: { dir: 'up' | 'down'; disabled: bo
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         lineHeight: 1,
       }}
-      onMouseEnter={e => { if (!disabled) e.currentTarget.style.color = '#D94F35' }}
+      onMouseEnter={e => { if (!disabled) e.currentTarget.style.color = '#FF5C1A' }}
       onMouseLeave={e => { e.currentTarget.style.color = disabled ? 'rgba(61,26,46,0.18)' : '#8B6A5A' }}
     >
       {dir === 'up' ? '▲' : '▼'}

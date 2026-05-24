@@ -19,7 +19,7 @@ export default async function DashboardPage() {
       style={{ backgroundColor: '#F5F0E8', color: '#3D1A2E' }}
     >
       <div className="text-center">
-        <span className="text-2xl font-bold" style={{ color: '#D94F35' }}>
+        <span className="text-2xl font-bold" style={{ color: '#FF5C1A' }}>
           RSViP
         </span>
         <p className="mt-4 text-lg font-medium">

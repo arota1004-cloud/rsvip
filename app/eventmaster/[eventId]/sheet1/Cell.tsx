@@ -48,15 +48,15 @@ export default function Cell({
   }, [isEditing, colType])
 
   const borderStyle = isAnchor
-    ? '2px solid #D94F35'
+    ? '2px solid #FF5C1A'
     : isSelected
-    ? '1px solid rgba(217,79,53,0.3)'
+    ? '1px solid rgba(255,92,26,0.3)'
     : '1px solid transparent'
 
   const bgStyle = isAnchor
-    ? 'rgba(217,79,53,0.04)'
+    ? 'rgba(255,92,26,0.04)'
     : isSelected
-    ? 'rgba(217,79,53,0.07)'
+    ? 'rgba(255,92,26,0.07)'
     : 'transparent'
 
   // ── dropdown / survey: 항상 <select> 렌더링 ─────────────────────────────────
@@ -157,7 +157,7 @@ export default function Cell({
   // ── 텍스트: 편집 모드 ─────────────────────────────────────────────────────────
   if (isEditing) {
     return (
-      <div style={{ width, height: rowHeight, boxSizing: 'border-box', border: '2px solid #D94F35', backgroundColor: '#fff' }}>
+      <div style={{ width, height: rowHeight, boxSizing: 'border-box', border: '2px solid #FF5C1A', backgroundColor: '#fff' }}>
         <input
           ref={inputRef}
           type="text"

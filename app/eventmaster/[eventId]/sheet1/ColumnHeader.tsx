@@ -106,7 +106,7 @@ export default function ColumnHeader({
     <div
       style={{
         width: col.width, display: 'flex', flexDirection: 'column', position: 'relative', flexShrink: 0,
-        borderLeft: isDragOver ? '2px solid #D94F35' : '2px solid transparent',
+        borderLeft: isDragOver ? '2px solid #FF5C1A' : '2px solid transparent',
         transition: 'border-color 0.1s',
       }}
       draggable
@@ -124,7 +124,7 @@ export default function ColumnHeader({
           display: 'flex', alignItems: 'center',
           paddingLeft: 6, paddingRight: 22,
           fontSize: 12, fontWeight: 600, color: '#3D1A2E',
-          backgroundColor: isSelected ? 'rgba(217,79,53,0.08)' : '#F0EBE1',
+          backgroundColor: isSelected ? 'rgba(255,92,26,0.08)' : '#F0EBE1',
           borderRight: '1px solid rgba(61,26,46,0.12)',
           borderBottom: '2px solid rgba(61,26,46,0.15)',
           cursor: 'default', userSelect: 'none',
@@ -157,7 +157,7 @@ export default function ColumnHeader({
             position: 'absolute', right: 6, top: '50%', transform: 'translateY(-50%)',
             background: 'none', border: 'none', cursor: 'pointer', padding: 0,
             fontSize: 10, lineHeight: 1,
-            color: hasFilter ? '#D94F35' : 'rgba(61,26,46,0.3)',
+            color: hasFilter ? '#FF5C1A' : 'rgba(61,26,46,0.3)',
           }}
           title="필터/정렬"
         >
@@ -215,10 +215,10 @@ export default function ColumnHeader({
                 style={{
                   display: 'flex', alignItems: 'center', gap: 6, width: '100%', textAlign: 'left',
                   padding: '5px 6px', fontSize: 12, background: 'none', border: 'none', cursor: 'pointer',
-                  color: sortDir === dir ? '#D94F35' : '#3D1A2E', borderRadius: 5,
+                  color: sortDir === dir ? '#FF5C1A' : '#3D1A2E', borderRadius: 5,
                   fontWeight: sortDir === dir ? 600 : 400,
                 }}
-                onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'rgba(217,79,53,0.06)')}
+                onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'rgba(255,92,26,0.06)')}
                 onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
               >
                 {sortDir === dir && <span style={{ fontSize: 10 }}>✓</span>}
@@ -233,7 +233,7 @@ export default function ColumnHeader({
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
                 <p style={{ margin: 0, fontSize: 10, fontWeight: 700, color: '#8B6A5A', letterSpacing: 0.4, textTransform: 'uppercase' }}>값 필터</p>
                 {selectedValues.length > 0 && (
-                  <button onClick={() => onSelectedValuesChange([])} style={{ background: 'none', border: 'none', fontSize: 10, color: '#D94F35', cursor: 'pointer', padding: 0 }}>초기화</button>
+                  <button onClick={() => onSelectedValuesChange([])} style={{ background: 'none', border: 'none', fontSize: 10, color: '#FF5C1A', cursor: 'pointer', padding: 0 }}>초기화</button>
                 )}
               </div>
               {uniqueVals.map(v => (
@@ -247,7 +247,7 @@ export default function ColumnHeader({
                         : selectedValues.filter(s => s !== v)
                       onSelectedValuesChange(next)
                     }}
-                    style={{ accentColor: '#D94F35' }}
+                    style={{ accentColor: '#FF5C1A' }}
                   />
                   {v}
                 </label>
@@ -267,7 +267,7 @@ export default function ColumnHeader({
                     : selectedValues.filter(s => s !== '__empty__')
                   onSelectedValuesChange(next)
                 }}
-                style={{ accentColor: '#D94F35' }}
+                style={{ accentColor: '#FF5C1A' }}
               />
               빈 값
             </label>

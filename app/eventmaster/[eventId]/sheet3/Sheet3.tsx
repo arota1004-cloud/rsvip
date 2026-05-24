@@ -132,21 +132,21 @@ function NavItem({ label, icon, active, badge, onClick }: {
         display: 'flex', alignItems: 'center', gap: 8,
         padding: '9px 12px', borderRadius: 8, width: '100%',
         background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left',
-        backgroundColor: active ? 'rgba(217,79,53,0.08)' : 'transparent',
+        backgroundColor: active ? 'rgba(255,92,26,0.08)' : 'transparent',
         transition: 'background 0.1s',
       }}
       onMouseEnter={e => { if (!active) e.currentTarget.style.backgroundColor = 'rgba(61,26,46,0.05)' }}
       onMouseLeave={e => { if (!active) e.currentTarget.style.backgroundColor = 'transparent' }}
     >
       <span style={{ fontSize: 16, flexShrink: 0 }}>{icon}</span>
-      <span style={{ flex: 1, fontSize: 13, fontWeight: active ? 700 : 500, color: active ? '#D94F35' : '#3D1A2E' }}>
+      <span style={{ flex: 1, fontSize: 13, fontWeight: active ? 700 : 500, color: active ? '#FF5C1A' : '#3D1A2E' }}>
         {label}
       </span>
       {badge && (
         <span style={{
           fontSize: 10, padding: '1px 6px', borderRadius: 9999, flexShrink: 0,
-          backgroundColor: active ? 'rgba(217,79,53,0.15)' : 'rgba(61,26,46,0.08)',
-          color: active ? '#D94F35' : '#8B6A5A', fontWeight: 600,
+          backgroundColor: active ? 'rgba(255,92,26,0.15)' : 'rgba(61,26,46,0.08)',
+          color: active ? '#FF5C1A' : '#8B6A5A', fontWeight: 600,
         }}>
           {badge}
         </span>
