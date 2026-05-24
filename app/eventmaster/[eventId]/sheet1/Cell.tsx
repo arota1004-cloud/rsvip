@@ -9,6 +9,12 @@ const RSVP_COLORS: Record<string, { bg: string; text: string }> = {
   U: { bg: 'rgba(107,114,128,0.12)', text: '#6b7280' },
 }
 
+const RSVP_LABELS: Record<string, string> = {
+  Y: '참석',
+  N: '불참',
+  U: '미정',
+}
+
 type Props = {
   value: string
   isEditing: boolean
@@ -18,6 +24,7 @@ type Props = {
   colOptions?: string[]
   editValue: string
   onEditChange: (v: string) => void
+  onDirectChange?: (v: string) => void   // dropdown/survey 직접 변경 (edit mode 불필요)
   onMouseDown: (e: React.MouseEvent) => void
   onMouseEnter: () => void
   onDoubleClick: () => void
@@ -28,18 +35,17 @@ type Props = {
 export default function Cell({
   value, isEditing, isSelected, isAnchor,
   colType, colOptions,
-  editValue, onEditChange, onMouseDown, onMouseEnter, onDoubleClick,
+  editValue, onEditChange, onDirectChange,
+  onMouseDown, onMouseEnter, onDoubleClick,
   width, rowHeight,
 }: Props) {
-  const inputRef = useRef<HTMLInputElement>(null)
+  const inputRef  = useRef<HTMLInputElement>(null)
   const selectRef = useRef<HTMLSelectElement>(null)
 
+  // 텍스트 편집 모드 진입 시 자동 포커스
   useEffect(() => {
-    if (isEditing) {
-      inputRef.current?.focus()
-      selectRef.current?.focus()
-    }
-  }, [isEditing])
+    if (isEditing && colType === 'text') inputRef.current?.focus()
+  }, [isEditing, colType])
 
   const borderStyle = isAnchor
     ? '2px solid #D94F35'
@@ -53,29 +59,102 @@ export default function Cell({
     ? 'rgba(217,79,53,0.07)'
     : 'transparent'
 
-  // 편집 모드 — select (rsvp / dropdown)
-  if (isEditing && (colType === 'survey' || colType === 'dropdown')) {
-    const options = colType === 'survey'
-      ? [{ value: '', label: '-' }, { value: 'Y', label: 'Y — 참석' }, { value: 'N', label: 'N — 불참' }, { value: 'U', label: 'U — 미정' }]
-      : [{ value: '', label: '선택...' }, ...(colOptions ?? []).map(o => ({ value: o, label: o }))]
+  // ── dropdown / survey: 항상 <select> 렌더링 ─────────────────────────────────
+  // (edit mode / display mode 구분 없이 단일 클릭으로 바로 선택 가능)
+  if (colType === 'survey' || colType === 'dropdown') {
+    const opts = colType === 'survey'
+      ? [
+          { value: '',  label: '—' },
+          { value: 'Y', label: 'Y — 참석' },
+          { value: 'N', label: 'N — 불참' },
+          { value: 'U', label: 'U — 미정' },
+        ]
+      : [
+          { value: '', label: '선택...' },
+          ...(colOptions ?? []).map(o => ({ value: o, label: o })),
+        ]
+
+    const rsvpStyle = colType === 'survey' && value ? RSVP_COLORS[value] ?? null : null
 
     return (
-      <div style={{ width, height: rowHeight, boxSizing: 'border-box', border: '2px solid #D94F35' }}>
+      <div
+        onMouseEnter={onMouseEnter}
+        onDoubleClick={onDoubleClick}
+        // select를 클릭할 때는 preventDefault를 하지 않아야 네이티브 드롭다운이 열림
+        // → SpreadsheetGrid의 onMouseDown이 HTMLSelectElement를 감지해 처리
+        onMouseDown={onMouseDown}
+        style={{
+          width, height: rowHeight, boxSizing: 'border-box',
+          border: borderStyle,
+          backgroundColor: rsvpStyle ? rsvpStyle.bg : bgStyle,
+          position: 'relative',
+          display: 'flex', alignItems: 'center',
+        }}
+      >
+        {/* 선택된 값 배지 (포인터 이벤트 없음 → select가 클릭 수신) */}
+        {rsvpStyle && value ? (
+          <span style={{
+            pointerEvents: 'none',
+            position: 'absolute', left: 6,
+            fontSize: 11, padding: '1px 7px', borderRadius: 9999,
+            backgroundColor: rsvpStyle.bg, color: rsvpStyle.text, fontWeight: 700,
+            zIndex: 1,
+          }}>
+            {value} — {RSVP_LABELS[value]}
+          </span>
+        ) : value ? (
+          <span style={{
+            pointerEvents: 'none',
+            position: 'absolute', left: 6,
+            fontSize: 11, padding: '1px 7px', borderRadius: 9999,
+            backgroundColor: 'rgba(61,26,46,0.07)', color: '#3D1A2E',
+            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+            maxWidth: width - 30, zIndex: 1,
+          }}>
+            {value}
+          </span>
+        ) : (
+          <span style={{
+            pointerEvents: 'none',
+            position: 'absolute', left: 6,
+            fontSize: 11, color: 'rgba(61,26,46,0.3)',
+            zIndex: 1,
+          }}>
+            {colType === 'survey' ? '선택' : '선택...'}
+          </span>
+        )}
+
+        {/* 투명 select — 항상 오버레이로 클릭 수신 */}
         <select
           ref={selectRef}
-          value={editValue}
-          onChange={e => onEditChange(e.target.value)}
-          style={{ width: '100%', height: '100%', padding: '0 4px', fontSize: 12, border: 'none', outline: 'none', backgroundColor: '#fff', color: '#3D1A2E', cursor: 'pointer' }}
+          value={value}
+          onChange={e => onDirectChange?.(e.target.value)}
+          style={{
+            position: 'absolute', inset: 0,
+            width: '100%', height: '100%',
+            opacity: 0,           // 완전 투명: 배지는 위 span이 표시
+            cursor: 'pointer',
+            border: 'none', outline: 'none',
+            zIndex: 2,            // span 위에서 클릭 수신
+          }}
         >
-          {options.map(opt => (
+          {opts.map(opt => (
             <option key={opt.value} value={opt.value}>{opt.label}</option>
           ))}
         </select>
+
+        {/* ▼ 드롭다운 화살표 */}
+        <span style={{
+          position: 'absolute', right: 4, top: '50%',
+          transform: 'translateY(-50%)',
+          fontSize: 8, color: 'rgba(61,26,46,0.4)',
+          pointerEvents: 'none', zIndex: 1,
+        }}>▼</span>
       </div>
     )
   }
 
-  // 편집 모드 — text
+  // ── 텍스트: 편집 모드 ─────────────────────────────────────────────────────────
   if (isEditing) {
     return (
       <div style={{ width, height: rowHeight, boxSizing: 'border-box', border: '2px solid #D94F35', backgroundColor: '#fff' }}>
@@ -84,18 +163,17 @@ export default function Cell({
           type="text"
           value={editValue}
           onChange={e => onEditChange(e.target.value)}
-          style={{ width: '100%', height: '100%', padding: '0 6px', fontSize: 12, border: 'none', outline: 'none', backgroundColor: 'transparent', color: '#3D1A2E' }}
+          style={{
+            width: '100%', height: '100%', padding: '0 6px',
+            fontSize: 12, border: 'none', outline: 'none',
+            backgroundColor: 'transparent', color: '#3D1A2E',
+          }}
         />
       </div>
     )
   }
 
-  // 표시 모드 — RSVP 배지
-  const rsvpStyle = colType === 'survey' && value && RSVP_COLORS[value] ? RSVP_COLORS[value] : null
-
-  // 표시 모드 — dropdown 값 (배지)
-  const isDropdown = colType === 'dropdown' && value
-
+  // ── 텍스트: 표시 모드 ─────────────────────────────────────────────────────────
   return (
     <div
       onMouseDown={onMouseDown}
@@ -104,30 +182,14 @@ export default function Cell({
       style={{
         width, height: rowHeight, boxSizing: 'border-box',
         border: borderStyle,
-        backgroundColor: rsvpStyle ? rsvpStyle.bg : bgStyle,
-        padding: '0 6px', fontSize: 12,
-        color: rsvpStyle ? rsvpStyle.text : '#3D1A2E',
+        backgroundColor: bgStyle,
+        padding: '0 6px', fontSize: 12, color: '#3D1A2E',
         display: 'flex', alignItems: 'center',
         overflow: 'hidden', whiteSpace: 'nowrap',
         cursor: 'default', userSelect: 'none',
-        fontWeight: rsvpStyle ? 600 : 400,
-        position: 'relative',
       }}
     >
-      {rsvpStyle ? (
-        <span style={{ fontSize: 11, padding: '1px 6px', borderRadius: 9999, backgroundColor: rsvpStyle.bg }}>
-          {value}
-        </span>
-      ) : isDropdown ? (
-        <span style={{ flex: 1, fontSize: 11, padding: '1px 7px', borderRadius: 9999, backgroundColor: 'rgba(61,26,46,0.07)', color: '#3D1A2E', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-          {value}
-        </span>
-      ) : (
-        <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}>{value}</span>
-      )}
-      {colType === 'dropdown' && (
-        <span style={{ flexShrink: 0, fontSize: 8, color: 'rgba(61,26,46,0.35)', marginLeft: 2, lineHeight: 1 }}>▼</span>
-      )}
+      <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}>{value}</span>
     </div>
   )
 }

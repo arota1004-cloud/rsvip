@@ -28,7 +28,9 @@ export default function SpreadsheetGrid({
 }: Props) {
   const grid = useGrid(initialColumns, initialRows)
   const [filters, setFilters] = useState<Record<string, string>>({})
-  const [colPanelIdx, setColPanelIdx] = useState<number | null>(null)
+  const [dockOpen, setDockOpen]           = useState(false)
+  const [activeDockCol, setActiveDockCol] = useState(0)
+  const dockOpenRef = useRef(false)
   const [editingHeaderIdx, setEditingHeaderIdx] = useState<number | null>(null)
   const [showUpload, setShowUpload] = useState(false)
 
@@ -189,10 +191,15 @@ export default function SpreadsheetGrid({
           )}
         </div>
         <div style={{ flex: 1 }} />
-        <ToolBtn label="⚙ 컬럼 관리" onClick={() => {
-          const idx = grid.selection?.anchor.col ?? 0
-          setColPanelIdx(idx)
-        }} />
+        <ToolBtn
+          label={dockOpen ? '⚙ 컬럼 설정 닫기' : '⚙ 컬럼 설정'}
+          onClick={() => {
+            const next = !dockOpen
+            if (next) setActiveDockCol(grid.selection?.anchor.col ?? 0)
+            setDockOpen(next)
+            dockOpenRef.current = next
+          }}
+        />
       </div>
 
       {/* 그리드 컨테이너 */}
@@ -232,7 +239,10 @@ export default function SpreadsheetGrid({
                 onRename={name => { grid.renameColumn(ci, name); scheduleSave() }}
                 onResize={(idx, w) => { grid.resizeColumn(idx, w); scheduleSave() }}
                 onContextMenu={(e, idx) => setContextMenu({ x: e.clientX, y: e.clientY, colIndex: idx })}
-                onColumnClick={ci => grid.setSelection({ anchor: { row: 0, col: ci }, focus: { row: filteredRows.length - 1, col: ci } })}
+                onColumnClick={ci => {
+                  grid.setSelection({ anchor: { row: 0, col: ci }, focus: { row: filteredRows.length - 1, col: ci } })
+                  if (dockOpenRef.current) setActiveDockCol(ci)
+                }}
                 // DnD
                 onDragStart={setDragColIdx}
                 onDragOver={setDragOverColIdx}
@@ -325,12 +335,21 @@ export default function SpreadsheetGrid({
                       colOptions={col.options}
                       editValue={isEditing ? grid.editValue : ''}
                       onEditChange={handleCellChange}
+                      onDirectChange={(v) => {
+                        // dropdown / survey: edit mode 없이 직접 값 변경
+                        grid.setCellValue(ri, ci, v)
+                        scheduleSave()
+                      }}
                       onMouseDown={e => {
-                        e.preventDefault()
+                        const fromSelect = e.target instanceof HTMLSelectElement
+                        // <select> 클릭 시: preventDefault 하면 네이티브 드롭다운이 열리지 않음
+                        if (!fromSelect) e.preventDefault()
                         isMouseDownRef.current = true
                         if (grid.editingCell) grid.commitEdit(grid.editingCell.row, grid.editingCell.col)
                         grid.setSelection({ anchor: { row: ri, col: ci }, focus: { row: ri, col: ci } })
-                        containerRef.current?.focus()
+                        if (!fromSelect) containerRef.current?.focus()
+                        // dock이 열려 있으면 선택 컬럼으로 자동 전환
+                        if (dockOpenRef.current && ci < grid.columns.length) setActiveDockCol(ci)
                       }}
                       onMouseEnter={() => {
                         if (!isMouseDownRef.current) return
@@ -420,17 +439,22 @@ export default function SpreadsheetGrid({
         />
       )}
 
-      {/* 컬럼 관리 패널 */}
-      {colPanelIdx !== null && grid.columns[colPanelIdx] && (
-        <ColumnManagerPanel
-          col={grid.columns[colPanelIdx]}
-          colIndex={colPanelIdx}
-          totalCols={grid.columns.length}
-          onUpdate={patch => { grid.updateColumn(colPanelIdx, patch); scheduleSave() }}
-          onDelete={() => { grid.deleteColumn(colPanelIdx); scheduleSave() }}
-          onClose={() => setColPanelIdx(null)}
-        />
-      )}
+      {/* 컬럼 설정 사이드 독 */}
+      <ColumnManagerPanel
+        open={dockOpen}
+        col={grid.columns[activeDockCol] ?? null}
+        colIndex={activeDockCol}
+        totalCols={grid.columns.length}
+        onUpdate={patch => { grid.updateColumn(activeDockCol, patch); scheduleSave() }}
+        onDelete={() => {
+          grid.deleteColumn(activeDockCol)
+          scheduleSave()
+          const remaining = grid.columns.length - 1
+          if (remaining === 0) { setDockOpen(false); dockOpenRef.current = false }
+          else setActiveDockCol(Math.min(activeDockCol, remaining - 1))
+        }}
+        onClose={() => { setDockOpen(false); dockOpenRef.current = false }}
+      />
     </div>
   )
 }

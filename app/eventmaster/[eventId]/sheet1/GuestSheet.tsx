@@ -140,22 +140,30 @@ function nowStr() {
 
 // ─── 컴포넌트 ─────────────────────────────────────────────────────────────────
 export default function GuestSheet({ eventId, initialColumns, initialRows, readOnly = false, onSaveStatusChange, onAlert }: Props) {
-  const [columns, setColumns] = useState<Column[]>(initialColumns)
-  const [colPanelIdx, setColPanelIdx] = useState<number | null>(null)
+  const [columns, setColumns]       = useState<Column[]>(initialColumns)
   const [showUpload, setShowUpload] = useState(false)
 
-  const workbookRef = useRef<any>(null)
-  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  // FortuneSheet 재마운트 제어 (선택지 적용 시 dataVerification 갱신)
+  const [remountKey, setRemountKey]           = useState(0)
+  const [activeSheetData, setActiveSheetData] = useState<Sheet[]>(() => [makeSheet(initialColumns, initialRows)])
+
+  // ── 우측 컬럼 설정 dock ──────────────────────────────────────────────────────
+  const [dockOpen, setDockOpen]         = useState(false)
+  const [activeDockCol, setActiveDockCol] = useState(0)
+  // ref: hook 클로저에서 항상 최신 상태를 읽기 위해
+  const dockOpenRef = useRef(false)
+  useEffect(() => { dockOpenRef.current = dockOpen }, [dockOpen])
+
+  const workbookRef   = useRef<any>(null)
+  const saveTimer     = useRef<ReturnType<typeof setTimeout> | null>(null)
   const selectedColRef = useRef<number>(0)
-  const columnsRef = useRef<Column[]>(initialColumns)
-  const rowIdMap = useRef<Map<number, string>>(
+  const columnsRef    = useRef<Column[]>(initialColumns)
+  const rowIdMap      = useRef<Map<number, string>>(
     new Map(initialRows.map((r, i) => [i + 1, r.id]))
   )
 
   // columns 변경 시 ref 동기화
   useEffect(() => { columnsRef.current = columns }, [columns])
-
-  const [sheetData] = useState<Sheet[]>(() => [makeSheet(initialColumns, initialRows)])
 
   // ─ 자동저장 (2초 디바운스) ───────────────────────────────────────────────────
   const scheduleSave = useCallback(() => {
@@ -233,9 +241,15 @@ export default function GuestSheet({ eventId, initialColumns, initialRows, readO
     setColumns(prev => {
       const next = prev.filter((_, i) => i !== idx)
       columnsRef.current = next
+      // 삭제 후 dock이 열려 있으면 인접 컬럼으로 이동
+      if (next.length === 0) {
+        setDockOpen(false)
+        dockOpenRef.current = false
+      } else {
+        setActiveDockCol(Math.min(idx, next.length - 1))
+      }
       return next
     })
-    setColPanelIdx(null)
     scheduleSave()
   }, [scheduleSave])
 
@@ -274,6 +288,54 @@ export default function GuestSheet({ eventId, initialColumns, initialRows, readO
     scheduleSave()
   }, [onAlert, scheduleSave])
 
+  // ─ 선택지 적용: 현재 데이터 추출 → 새 dataVerification으로 FortuneSheet 재마운트 ─
+  const handleSaveOptions = useCallback(async () => {
+    const currentSheets: Sheet[] | undefined = workbookRef.current?.getAllSheets?.()
+    const sheet = currentSheets?.[0]
+
+    // FortuneSheet 현재 데이터 추출
+    const { rows: currentRows, newMap } = sheet
+      ? extractRows(sheet, columnsRef.current, rowIdMap.current)
+      : { rows: [], newMap: new Map<number, string>() }
+    if (sheet) rowIdMap.current = newMap
+
+    // 업데이트된 컬럼(options 포함)으로 시트 재빌드 → 재마운트
+    const newSheet = makeSheet(columnsRef.current, currentRows)
+    setActiveSheetData([newSheet])
+    setRemountKey(k => k + 1)
+
+    // 즉시 DB 저장
+    onSaveStatusChange('saving')
+    try {
+      await Promise.all([
+        currentRows.length > 0 ? upsertGuests(eventId, currentRows) : Promise.resolve(),
+        saveColumns(eventId, columnsRef.current),
+      ])
+      onSaveStatusChange('saved', nowStr())
+    } catch {
+      onSaveStatusChange('error')
+    }
+  }, [eventId, onSaveStatusChange])
+
+  // ─ 수동 저장 버튼 ────────────────────────────────────────────────────────────
+  const handleManualSave = useCallback(async () => {
+    if (saveTimer.current) clearTimeout(saveTimer.current)
+    onSaveStatusChange('saving')
+    try {
+      const currentSheets: Sheet[] | undefined = workbookRef.current?.getAllSheets?.()
+      const sheet = currentSheets?.[0]
+      if (sheet) {
+        const { rows, newMap } = extractRows(sheet, columnsRef.current, rowIdMap.current)
+        rowIdMap.current = newMap
+        await upsertGuests(eventId, rows)
+      }
+      await saveColumns(eventId, columnsRef.current)
+      onSaveStatusChange('saved', nowStr())
+    } catch {
+      onSaveStatusChange('error')
+    }
+  }, [eventId, onSaveStatusChange])
+
   return (
     <div style={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column' }}>
       {/* 툴바 */}
@@ -293,7 +355,19 @@ export default function GuestSheet({ eventId, initialColumns, initialRows, readO
           <>
             <ToolBtn label="📂 파일 가져오기" onClick={() => setShowUpload(true)} />
             <div style={{ flex: 1 }} />
-            <ToolBtn label="⚙ 컬럼 관리" onClick={() => setColPanelIdx(selectedColRef.current)} />
+            {/* 수동 저장 버튼 — 즉시 저장 후 TopDock에 "저장됨 · HH:mm" 표시 */}
+            <ToolBtn label="💾 저장" onClick={handleManualSave} primary />
+            <div style={{ width: 6 }} />
+            <ToolBtn
+              label={dockOpen ? '⚙ 컬럼 설정 닫기' : '⚙ 컬럼 설정'}
+              active={dockOpen}
+              onClick={() => {
+                const next = !dockOpen
+                if (next) setActiveDockCol(Math.min(selectedColRef.current, Math.max(0, columnsRef.current.length - 1)))
+                setDockOpen(next)
+                dockOpenRef.current = next
+              }}
+            />
           </>
         )}
       </div>
@@ -316,7 +390,12 @@ export default function GuestSheet({ eventId, initialColumns, initialRows, readO
           filterContextMenu={[]}
           hooks={readOnly ? {} : {
             afterSelectionChange: (_sheetId: string, selection: any) => {
-              selectedColRef.current = selection?.column?.[0] ?? 0
+              const col = selection?.column?.[0] ?? 0
+              selectedColRef.current = col
+              // dock이 열려 있으면 선택 컬럼으로 자동 전환
+              if (dockOpenRef.current && col < columnsRef.current.length) {
+                setActiveDockCol(col)
+              }
             },
             beforeUpdateCell: (r: number, c: number) => {
               if (r === 0) return false
@@ -328,17 +407,16 @@ export default function GuestSheet({ eventId, initialColumns, initialRows, readO
         />
       </div>
 
-      {/* 컬럼 관리 패널 */}
-      {colPanelIdx !== null && columns[colPanelIdx] && (
-        <ColumnManagerPanel
-          col={columns[colPanelIdx]}
-          colIndex={colPanelIdx}
-          totalCols={columns.length}
-          onUpdate={patch => handleColUpdate(colPanelIdx, patch)}
-          onDelete={() => handleColDelete(colPanelIdx)}
-          onClose={() => setColPanelIdx(null)}
-        />
-      )}
+      {/* 컬럼 설정 사이드 독 — 항상 렌더링, open prop으로 슬라이드 제어 */}
+      <ColumnManagerPanel
+        open={dockOpen}
+        col={columns[activeDockCol] ?? null}
+        colIndex={activeDockCol}
+        totalCols={columns.length}
+        onUpdate={patch => handleColUpdate(activeDockCol, patch)}
+        onDelete={() => handleColDelete(activeDockCol)}
+        onClose={() => { setDockOpen(false); dockOpenRef.current = false }}
+      />
 
       {/* 파일 업로드 모달 */}
       {showUpload && (
@@ -352,17 +430,44 @@ export default function GuestSheet({ eventId, initialColumns, initialRows, readO
   )
 }
 
-function ToolBtn({ label, onClick }: { label: string; onClick: () => void }) {
+function ToolBtn({
+  label, onClick, active = false, primary = false,
+}: {
+  label: string
+  onClick: () => void
+  active?: boolean
+  primary?: boolean
+}) {
+  if (primary) {
+    return (
+      <button
+        onClick={onClick}
+        style={{
+          padding: '4px 12px', borderRadius: 6, fontSize: 12, fontWeight: 600,
+          border: 'none', cursor: 'pointer',
+          backgroundColor: '#D94F35', color: '#fff',
+          transition: 'background 0.12s',
+        }}
+        onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#C04030')}
+        onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#D94F35')}
+      >
+        {label}
+      </button>
+    )
+  }
   return (
     <button
       onClick={onClick}
       style={{
         padding: '4px 12px', borderRadius: 6, fontSize: 12, fontWeight: 500,
-        border: '1px solid rgba(61,26,46,0.15)', cursor: 'pointer',
-        backgroundColor: 'transparent', color: '#3D1A2E',
+        border: `1px solid ${active ? '#D94F35' : 'rgba(61,26,46,0.15)'}`,
+        cursor: 'pointer',
+        backgroundColor: active ? 'rgba(217,79,53,0.07)' : 'transparent',
+        color: active ? '#D94F35' : '#3D1A2E',
+        transition: 'all 0.12s',
       }}
-      onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'rgba(61,26,46,0.05)')}
-      onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
+      onMouseEnter={e => { if (!active) e.currentTarget.style.backgroundColor = 'rgba(61,26,46,0.05)' }}
+      onMouseLeave={e => { if (!active) e.currentTarget.style.backgroundColor = 'transparent' }}
     >
       {label}
     </button>
